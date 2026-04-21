@@ -31,20 +31,17 @@ public class MemoryManager {
     }
 
     public Page[] allocate(int wordsSize) {
-        int numPages = wordsSize / pageSize;
+        int numPages = (wordsSize + pageSize - 1) / pageSize;
 
+        Frame[] available = getAvailableFrames();
         if (numPages > getAvailableFrames().length ) {
             return null;
         }
-
         Page[] pages = new Page[numPages];
 
         for (int i = 0; i < numPages; i++) {
-            for(int j = 0; j < frameControl.length; j++) {
-                if (memory.pos[j*pageSize] == null) {
-                    pages[i] = new Page(frameControl[j], pageSize);
-                }
-            }
+            available[i].isOccupied = true;
+            pages[i] = new Page(available[i], pageSize);
         }
 
         return pages;
