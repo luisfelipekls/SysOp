@@ -11,10 +11,12 @@ public class PCB {
     private ProcessStatus status;
     public Frame[] frames;
     public Page[] pages;
+    private String programName;
 
     PCB(){
         id = idCounter++;
         status = ProcessStatus.CREATED;
+        programName = "unknown";
     }
 
     public void setFrames(Frame[] programFrames){
@@ -23,5 +25,13 @@ public class PCB {
 
     public void setPages(Page[] programPages) {
         pages = programPages;
+    }
+
+    public void setProgramName(String name) {
+        this.programName = name;
+    }
+
+    public String getProgramName() {
+        return programName;
     }
 }
