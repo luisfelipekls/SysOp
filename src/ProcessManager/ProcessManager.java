@@ -1,6 +1,7 @@
 package ProcessManager;
 
 import memoria.*;
+import system.Sistema;
 import system.Sistema.*;
 
 import java.util.ArrayList;
@@ -11,11 +12,11 @@ public class ProcessManager {
     private MemoryManager memoryManager;
     private Memory memory;
     private CPU cpu;
-    private Sistema.Programs programs;
-    private List<PCB> pcbReadyList = new ArrayList<>();
-    private PCB running;
+    private Programs programs;
+    public List<PCB> pcbReadyList = new ArrayList<>();
+    public PCB running;
 
-    public ProcessManager(Memory memory, MemoryManager memoryManager, CPU cpu, Sistema.Programs programs) {
+    public ProcessManager(Memory memory, MemoryManager memoryManager, CPU cpu, Programs programs) {
         this.memory = memory;
         this.memoryManager = memoryManager;
         this.cpu = cpu;
@@ -63,7 +64,7 @@ public class ProcessManager {
         for(int i = 0; i < currentPCB.frames.length; i++){
             //esse aqui é pra percorrer os frames e atribuir no endereço de memoria as palavras do programa
             for (int j = 0; j<frameSize; j++){
-                memory.pos[currentPCB.frames[i].start+j] = null;
+                memory.pos[currentPCB.frames[i].start+j] = new Word(Opcode.___, -1, -1, -1);
             }
         }
     }
@@ -107,15 +108,23 @@ public class ProcessManager {
         running = pcb;
         pcb.status = ProcessStatus.EXECUTING;
         
-        int startAddress = pcb.frames[0].start;
+        int startAddress = pcb.processPc; //inicia ou retoma a execução do processo
         cpu.setContext(startAddress);
         
         System.out.println("[PM] Executando processo PID=" + pid + "...");
-        cpu.run();
+        pcbReadyList.remove(pcb);
+        cpu.run(running);
+
         
         pcb.status = ProcessStatus.FINISHED;
         running = null;
         System.out.println("[PM] Processo PID=" + pid + " finalizado.");
+    }
+
+    public void execAll(){
+        while(!pcbReadyList.isEmpty()){
+            executeProcess(pcbReadyList.get(0).id);
+        }
     }
 
     public void listProcesses() {

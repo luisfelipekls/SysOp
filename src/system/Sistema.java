@@ -20,6 +20,10 @@ package system;// PUCRS - Escola Politécnica - Sistemas Operacionais
 //    Veja o main.  Ele instancia o system.Sistema com os elementos mencionados acima.
 //           em seguida solicita a execução de algum programa com  loadAndExec
 
+import ProcessManager.PCB;
+import ProcessManager.ProcessManager;
+import memoria.MemoryManager;
+
 public class Sistema {
 
 	// -------------------------------------------------------------------------------------------------------
@@ -29,6 +33,18 @@ public class Sistema {
 	// -------------------------------------------------------------------------------------------------------
 	// --------------------- M E M O R I A - definicoes de palavra de memoria,
 	// memória ----------------------
+
+	private ProcessManager processManager;
+
+	public void setMemoryManager(MemoryManager memoryManager) {
+		this.memoryManager = memoryManager;
+	}
+
+	public void setProcessManager(ProcessManager processManager) {
+		this.processManager = processManager;
+	}
+
+	private MemoryManager memoryManager;
 
 	public class Memory {
 		public Word[] pos; // pos[i] é a posição i da memória. cada posição é uma palavra.
@@ -42,7 +58,7 @@ public class Sistema {
 		}
 	}
 
-	public class Word {    // cada posicao da memoria tem uma instrucao (ou um dado)
+	public static class Word {    // cada posicao da memoria tem uma instrucao (ou um dado)
 		public Opcode opc; //
 		public int ra;     // indice do primeiro registrador da operacao (Rs ou Rd cfe opcode na tabela)
 		public int rb;     // indice do segundo registrador da operacao (Rc ou Rs cfe operacao)
@@ -147,16 +163,23 @@ public class Sistema {
 			irpt = Interrupts.noInterrupt;                // reset da interrupcao registrada
 		}
 
-		public void run() {                               // execucao da CPU supoe que o contexto da CPU, vide acima, 
-														  // esta devidamente setado
+		public void run(PCB runningProcess) {                               // execucao da CPU supoe que o contexto da CPU, vide acima,
+			Integer cicleLimit = 5;
+			Integer cicle = 0;
 			cpuStop = false;
 			while (!cpuStop) {      // ciclo de instrucoes. acaba cfe resultado da exec da instrucao, veja cada caso.
+				if (cicle >= cicleLimit) {
+					sysCall.stop();
+					cpuStop = true;
+					processManager.pcbReadyList.add(runningProcess);
 
+					break;
+				}
 				// --------------------------------------------------------------------------------------------------
 				// FASE DE FETCH
 				if (legal(pc)) { // pc valido
 					ir = m[pc];  // <<<<<<<<<<<< AQUI faz FETCH - busca posicao da memoria apontada por pc, guarda em ir
-					             // resto é dump de debug
+					runningProcess.processPc = pc;             // resto é dump de debug
 					if (debug) {
 						System.out.print("                                              regs: ");
 						for (int i = 0; i < 10; i++) {
@@ -349,6 +372,9 @@ public class Sistema {
 					ih.handle(irpt);                  // desvia para rotina de tratamento - esta rotina é do SO
 					cpuStop = true;                   // nesta versao, para a CPU
 				}
+
+				runningProcess.processPc = pc;
+				cicle++;
 			} // FIM DO CICLO DE UMA INSTRUÇÃO
 		}
 	}
@@ -475,7 +501,7 @@ public class Sistema {
 			dump(0, p.length); // dump da memoria nestas posicoes
 			hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
 			System.out.println("---------------------------------- inicia execucao ");
-			hw.cpu.run(); // cpu roda programa ate parar
+			hw.cpu.run(processManager.running); // cpu roda programa ate parar
 			System.out.println("---------------------------------- memoria após execucao ");
 			dump(0, p.length); // dump da memoria com resultado
 		}
@@ -553,7 +579,7 @@ public class Sistema {
 
 		public Word[] retrieveProgram(String pname) {
 			for (Program p : progs) {
-				if (p != null & p.name == pname)
+				if (p != null & p.name.equals(pname))
 					return p.image;
 			}
 			return null;

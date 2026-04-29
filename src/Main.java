@@ -24,6 +24,9 @@ public class Main {
             sistema.progs
         );
 
+        sistema.setProcessManager(processManager);
+        sistema.setMemoryManager(memoryManager);
+
         sistema.hw.cpu.setAddressOfHandlers(sistema.so.ih, sistema.so.sc);
         sistema.hw.cpu.setUtilities(sistema.so.utils);
 
@@ -36,6 +39,7 @@ public class Main {
         System.out.println("  dump           - Mostra estado da memória");
         System.out.println("  dumpM          - Mostra estado do gerenciador de memória");
         System.out.println("  exec <pid>     - Executa um processo");
+        System.out.println("  execAll        - Executa todos os processos");
         System.out.println("  traceOn        - Habilita rastreamento (debug)");
         System.out.println("  traceOff       - Desabilita rastreamento (debug)");
         System.out.println("  exit           - Sai do sistema");
@@ -78,6 +82,9 @@ public class Main {
                     break;
                 case "exec":
                     handleExec(parts);
+                    break;
+                case "execall":
+                    handleExecAll();
                     break;
                 case "traceon":
                     handleTraceOn();
@@ -157,6 +164,10 @@ public class Main {
         } catch (NumberFormatException e) {
             System.out.println("PID inválido: " + parts[1]);
         }
+    }
+
+    private static void handleExecAll() {
+        processManager.execAll();
     }
 
     private static void handleTraceOn() {

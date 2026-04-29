@@ -8,9 +8,10 @@ import java.util.UUID;
 public class PCB {
     private static int idCounter = 0;
     public Integer id;
-    private ProcessStatus status;
+    public ProcessStatus status;
     public Frame[] frames;
     public Page[] pages;
+    public Integer processPc;
     private String programName;
 
     PCB(){
@@ -21,6 +22,7 @@ public class PCB {
 
     public void setFrames(Frame[] programFrames){
         frames = programFrames;
+        processPc = frames[0].start;
     }
 
     public void setPages(Page[] programPages) {
