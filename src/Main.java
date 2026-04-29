@@ -160,7 +160,7 @@ public class Main {
 
         try {
             int pid = Integer.parseInt(parts[1]);
-            processManager.executeProcess(pid);
+            processManager.executeProcess(pid, false);
         } catch (NumberFormatException e) {
             System.out.println("PID inválido: " + parts[1]);
         }

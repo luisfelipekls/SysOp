@@ -23,6 +23,7 @@ package system;// PUCRS - Escola Politécnica - Sistemas Operacionais
 import ProcessManager.PCB;
 import ProcessManager.ProcessManager;
 import memoria.MemoryManager;
+import ProcessManager.ProcessStatus;
 
 public class Sistema {
 
@@ -163,17 +164,20 @@ public class Sistema {
 			irpt = Interrupts.noInterrupt;                // reset da interrupcao registrada
 		}
 
-		public void run(PCB runningProcess) {                               // execucao da CPU supoe que o contexto da CPU, vide acima,
+		public void run(PCB runningProcess, boolean isExecAll) {                               // execucao da CPU supoe que o contexto da CPU, vide acima,
 			Integer cicleLimit = 5;
 			Integer cicle = 0;
 			cpuStop = false;
+			boolean interuption = false;
 			while (!cpuStop) {      // ciclo de instrucoes. acaba cfe resultado da exec da instrucao, veja cada caso.
-				if (cicle >= cicleLimit) {
-					sysCall.stop();
-					cpuStop = true;
-					processManager.pcbReadyList.add(runningProcess);
-
-					break;
+				if(isExecAll){
+					if (cicle >= cicleLimit) {
+						sysCall.stop();
+						cpuStop = true;
+						processManager.pcbReadyList.add(runningProcess);
+						interuption = true;
+						break;
+					}
 				}
 				// --------------------------------------------------------------------------------------------------
 				// FASE DE FETCH
@@ -376,6 +380,10 @@ public class Sistema {
 				runningProcess.processPc = pc;
 				cicle++;
 			} // FIM DO CICLO DE UMA INSTRUÇÃO
+			if(!interuption){
+				runningProcess.status = ProcessStatus.FINISHED;
+			}
+
 		}
 	}
 	// ------------------ C P U - fim
@@ -501,7 +509,7 @@ public class Sistema {
 			dump(0, p.length); // dump da memoria nestas posicoes
 			hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
 			System.out.println("---------------------------------- inicia execucao ");
-			hw.cpu.run(processManager.running); // cpu roda programa ate parar
+			hw.cpu.run(processManager.running, false); // cpu roda programa ate parar
 			System.out.println("---------------------------------- memoria após execucao ");
 			dump(0, p.length); // dump da memoria com resultado
 		}

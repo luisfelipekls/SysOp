@@ -98,7 +98,7 @@ public class ProcessManager {
         return pcbReadyList.stream().filter(p -> p.id == pid).findFirst().orElse(null);
     }
 
-    public void executeProcess(int pid) {
+    public void executeProcess(int pid, boolean isExecAll) {
         PCB pcb = getProcess(pid);
         if (pcb == null) {
             System.out.println("[PM] Erro: Processo PID=" + pid + " não encontrado.");
@@ -113,17 +113,20 @@ public class ProcessManager {
         
         System.out.println("[PM] Executando processo PID=" + pid + "...");
         pcbReadyList.remove(pcb);
-        cpu.run(running);
+        cpu.run(running, isExecAll);
 
-        
-        pcb.status = ProcessStatus.FINISHED;
-        running = null;
-        System.out.println("[PM] Processo PID=" + pid + " finalizado.");
+        if(pcb.status == ProcessStatus.FINISHED){
+            memoryManager.deallocate(running.pages);
+            System.out.println("[PM] Processo PID=" + pid + " finalizado.");
+            running = null;
+        }else{
+            System.out.println("[PM] Processo PID=" + pid + " interrompido.");
+        }
     }
 
     public void execAll(){
         while(!pcbReadyList.isEmpty()){
-            executeProcess(pcbReadyList.get(0).id);
+            executeProcess(pcbReadyList.get(0).id, true);
         }
     }
 
