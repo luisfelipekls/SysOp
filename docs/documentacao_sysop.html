@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SysOp - Documentação Completa</title>
+  <style>
+    :root {
+      --primary: #1a365d;
+      --secondary: #2b6cb0;
+      --accent: #3182ce;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --code-bg: #1a202c;
+      --code-fg: #e2e8f0;
+      --border: #e2e8f0;
+      --text: #2d3748;
+      --muted: #718096;
+      --warn: #744210;
+      --warn-bg: #fefcbf;
+      --tip: #1a4731;
+      --tip-bg: #c6f6d5;
+      --q: #44337a;
+      --q-bg: #faf5ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    @media print {
+      body { background: white; font-size: 12px; }
+      .no-print { display: none; }
+      section { page-break-inside: avoid; }
+      h2 { page-break-before: always; }
+      pre { white-space: pre-wrap; word-break: break-all; }
+    }
+
+    /* COVER */
+    .cover {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 80px 60px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .cover .badge {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+    .cover h1 { font-size: 48px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+    .cover .subtitle { font-size: 20px; opacity: 0.85; margin-bottom: 40px; }
+    .cover .meta { border-top: 1px solid rgba(255,255,255,0.3); padding-top: 32px; }
+    .cover .meta-item { margin-bottom: 8px; font-size: 14px; opacity: 0.9; }
+    .cover .meta-item strong { opacity: 1; }
+
+    /* LAYOUT */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 48px;
+    }
+    .toc h2 { color: var(--primary); font-size: 18px; margin-bottom: 20px; border: none; padding: 0; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .toc .sub { font-size: 13px; color: var(--muted); margin-top: 2px; padding-left: 16px; }
+
+    /* HEADINGS */
+    h1 { font-size: 32px; color: var(--primary); margin-bottom: 24px; }
+    h2 {
+      font-size: 24px;
+      color: var(--primary);
+      margin: 56px 0 24px 0;
+      padding-bottom: 10px;
+      border-bottom: 3px solid var(--accent);
+    }
+    h3 { font-size: 18px; color: var(--secondary); margin: 32px 0 14px 0; }
+    h4 { font-size: 15px; color: var(--text); margin: 20px 0 10px 0; font-weight: 600; }
+
+    p { margin-bottom: 14px; }
+    ul, ol { padding-left: 22px; margin-bottom: 14px; }
+    li { margin-bottom: 6px; }
+
+    /* CODE */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 12.5px;
+      line-height: 1.6;
+      margin: 16px 0 24px 0;
+      border-left: 4px solid var(--accent);
+    }
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+    p code, li code {
+      background: #ebf4ff;
+      color: var(--secondary);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+
+    /* CALLOUTS */
+    .callout {
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin: 20px 0;
+    }
+    .callout-title { font-weight: 700; margin-bottom: 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .warn { background: var(--warn-bg); color: var(--warn); border-left: 4px solid #d69e2e; }
+    .tip { background: var(--tip-bg); color: var(--tip); border-left: 4px solid #38a169; }
+
+    /* PRESENTATION BOXES */
+    .pres-box {
+      background: #ebf8ff;
+      border: 1px solid #bee3f8;
+      border-left: 5px solid #3182ce;
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin: 24px 0;
+    }
+    .pres-box .pres-title {
+      font-weight: 700;
+      color: #2b6cb0;
+      margin-bottom: 10px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .pres-box ul { margin-bottom: 0; }
+
+    /* QUESTION BOXES */
+    .q-box {
+      background: var(--q-bg);
+      border: 1px solid #d6bcfa;
+      border-left: 5px solid #805ad5;
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin: 24px 0;
+    }
+    .q-box .q-title {
+      font-weight: 700;
+      color: var(--q);
+      margin-bottom: 10px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .q-box li { margin-bottom: 10px; }
+    .q-box .answer {
+      font-size: 12.5px;
+      color: #553c9a;
+      margin-top: 4px;
+      padding-left: 12px;
+      border-left: 2px solid #d6bcfa;
+    }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 13px;
+    }
+    th {
+      background: var(--primary);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    tr:nth-child(even) td { background: var(--bg); }
+
+    /* DIAGRAM */
+    .diagram {
+      background: var(--code-bg);
+      color: #a0aec0;
+      border-radius: 8px;
+      padding: 24px;
+      font-family: 'Cascadia Code', monospace;
+      font-size: 12px;
+      margin: 20px 0;
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 40px 32px;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════ CAPA ══════════════════════════ -->
+<div class="cover">
+  <div class="badge">PUCRS &mdash; Engenharia de Software &mdash; 4º Semestre</div>
+  <h1>SysOp<br>Simulador de Sistema Operacional</h1>
+  <p class="subtitle">Documentação Técnica Completa &mdash; Trabalho T1 (A + B)<br>Disciplina: Sistemas Operacionais &mdash; Prof. Fernando Dotti</p>
+  <div class="meta">
+    <div class="meta-item"><strong>Partes implementadas:</strong> T1-A (Gerenciador de Memória) + T1-B (Gerenciador de Processos)</div>
+    <div class="meta-item"><strong>Linguagem:</strong> Java (sem frameworks externos)</div>
+    <div class="meta-item"><strong>Memória RAM simulada:</strong> 1.024 palavras / 64 frames de 16 palavras cada</div>
+    <div class="meta-item"><strong>Processos:</strong> criação, carregamento em frames, execução com paginação física, remoção</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ ÍNDICE ══════════════════════════ -->
+<div class="container">
+
+<div class="toc">
+  <h2>Sumário</h2>
+  <ol>
+    <li><a href="#visao">Visão Geral do Projeto</a></li>
+    <li><a href="#arquitetura">Arquitetura Geral</a></li>
+    <li>
+      <a href="#hardware">Camada de Hardware Simulado (<code>Sistema.java</code>)</a>
+      <div class="sub">3.1 Memória &bull; 3.2 Palavra (Word) &bull; 3.3 CPU e ciclo de instrução &bull; 3.4 Opcodes &bull; 3.5 Interrupções &bull; 3.6 Syscalls</div>
+    </li>
+    <li>
+      <a href="#memoria">Gerenciador de Memória Física (<code>T1-A</code>)</a>
+      <div class="sub">4.1 Frame &bull; 4.2 Page &bull; 4.3 MemoryManager</div>
+    </li>
+    <li>
+      <a href="#processos">Gerenciador de Processos (<code>T1-B</code>)</a>
+      <div class="sub">5.1 PCB &bull; 5.2 ProcessStatus &bull; 5.3 ProcessManager</div>
+    </li>
+    <li>
+      <a href="#traducao">Tradução de Endereços Lógicos em Físicos</a>
+    </li>
+    <li><a href="#cli">Interface de Linha de Comando (<code>Main.java</code>)</a></li>
+    <li><a href="#programas">Programas de Teste</a></li>
+    <li><a href="#scheduler">Escalonamento (T1-C &mdash; visão futura)</a></li>
+    <li><a href="#fluxo">Fluxo Completo de uma Execução</a></li>
+  </ol>
+</div>
+
+
+<!-- ══════════════════════════ 1. VISÃO GERAL ══════════════════════════ -->
+<section id="visao">
+<h2>1. Visão Geral do Projeto</h2>
+
+<p>O <strong>SysOp</strong> é um simulador educacional de sistema operacional desenvolvido em Java puro para a disciplina de Sistemas Operacionais da PUCRS. O objetivo é demonstrar, de forma didática e executável, os conceitos fundamentais de um SO real: gerenciamento de memória com paginação física, criação e ciclo de vida de processos, execução de programas na CPU simulada e tratamento de interrupções.</p>
+
+<p>O trabalho é dividido em partes incrementais:</p>
+
+<table>
+  <tr><th>Parte</th><th>Nome</th><th>O que adiciona</th><th>Status</th></tr>
+  <tr><td><strong>T1-A</strong></td><td>Gerenciador de Memória (GM)</td><td>Paginação física: alocar/liberar frames, carregar programa em frames não-contíguos</td><td>Concluído</td></tr>
+  <tr><td><strong>T1-B</strong></td><td>Gerenciador de Processos (GP)</td><td>PCB, fila de prontos, criar/remover processo, exec, execAll, CLI</td><td>Concluído</td></tr>
+  <tr><td><strong>T1-C</strong></td><td>Escalonador (Scheduler)</td><td>Round-Robin com quantum, interrupção de timer, múltiplos processos concorrentes</td><td>Em andamento</td></tr>
+</table>
+
+<div class="callout tip">
+  <div class="callout-title">Princípio central</div>
+  Os programas de usuário usam <strong>endereços lógicos contíguos</strong> (0, 1, 2, …). O sistema operacional é responsável por mapear esses endereços para <strong>frames físicos</strong> espalhados pela RAM, usando a tabela de páginas do processo.
+</div>
+
+<div class="pres-box">
+  <div class="pres-title">Pontos para apresentar nesta seção</div>
+  <ul>
+    <li>Contextualizar o problema: por que um SO precisa de gerenciamento de memória e de processos?</li>
+    <li>Mostrar que o projeto simula uma máquina real em miniatura: CPU, RAM, SO, programas.</li>
+    <li>Ressaltar que <em>não há frameworks</em> — tudo construído a partir do zero em Java.</li>
+    <li>Apresentar o diagrama de camadas (hardware → SO → usuário).</li>
+  </ul>
+</div>
+
+<div class="q-box">
+  <div class="q-title">Possíveis perguntas do professor</div>
+  <ul>
+    <li>
+      <em>Por que simular em Java e não usar C?</em>
+      <div class="answer">Java oferece coleta de lixo e tipos seguros, reduzindo erros de ponteiro que desviariam o foco do aprendizado. O comportamento do SO é modelado nas classes, não na linguagem.</div>
+    </li>
+    <li>
+      <em>O que diferencia T1-A de T1-B?</em>
+      <div class="answer">T1-A lida exclusivamente com a gestão de frames físicos (alocação/liberação). T1-B adiciona a abstração de processo: PCB, fila de prontos, ciclo de vida e execução da CPU em contexto de processo.</div>
+    </li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 2. ARQUITETURA ══════════════════════════ -->
+<section id="arquitetura">
+<h2>2. Arquitetura Geral</h2>
+
+<p>O sistema é organizado em quatro camadas bem definidas, cada uma contida em seu próprio pacote Java:</p>
+
+<div class="diagram">
+┌─────────────────────────────────────────────────────┐
+│                    USUÁRIO (CLI)                    │
+│                     Main.java                       │
+└────────────────────────┬────────────────────────────┘
+                         │ comandos: new, exec, rm, ps…
+┌────────────────────────▼────────────────────────────┐
+│              SISTEMA OPERACIONAL (SO)               │
+│  ProcessManager    MemoryManager    InterruptHandler│
+│  PCB / PCBList     Frame / Page     SysCallHandler  │
+└────────────────────────┬────────────────────────────┘
+                         │ acesso direto às estruturas
+┌────────────────────────▼────────────────────────────┐
+│              HARDWARE SIMULADO (HW)                 │
+│      CPU (fetch-decode-execute)    Memory (RAM)     │
+│      Registers [10]   IR   PC      Word[1024]       │
+└─────────────────────────────────────────────────────┘
+                         │ programas armazenados
+┌────────────────────────▼────────────────────────────┐
+│              PROGRAMAS (Programs)                   │
+│  fatorial, fibonacci, progMinimo, PB, PC (bubble)  │
+└─────────────────────────────────────────────────────┘
+</div>
+
+<h3>Pacotes e responsabilidades</h3>
+<table>
+  <tr><th>Pacote / Arquivo</th><th>Responsabilidade</th></tr>
+  <tr><td><code>system.Sistema</code></td><td>Toda a simulação de hardware: CPU, memória, HW, SO, programas — uma única classe com inner classes</td></tr>
+  <tr><td><code>memoria.MemoryManager</code></td><td>Controla quais frames estão livres/ocupados; aloca e libera conjuntos de frames (páginas)</td></tr>
+  <tr><td><code>memoria.Frame</code></td><td>Representa um frame físico (índice, endereço início/fim, flag de ocupação)</td></tr>
+  <tr><td><code>memoria.Page</code></td><td>Mapeia uma página lógica ao seu frame físico correspondente</td></tr>
+  <tr><td><code>ProcessManager.PCB</code></td><td>Process Control Block — estado de um processo (PID, status, PC salvo, registradores, páginas)</td></tr>
+  <tr><td><code>ProcessManager.ProcessStatus</code></td><td>Enum de estados do processo</td></tr>
+  <tr><td><code>ProcessManager.ProcessManager</code></td><td>Cria, executa e remove processos; mantém a fila de prontos</td></tr>
+  <tr><td><code>Main</code></td><td>Shell interativo (CLI) que recebe comandos do usuário</td></tr>
+</table>
+
+<div class="pres-box">
+  <div class="pres-title">Pontos para apresentar nesta seção</div>
+  <ul>
+    <li>Mostrar o diagrama de camadas e explicar o fluxo de uma chamada: usuário digita <code>new fatorial</code> → Main → ProcessManager → MemoryManager → memória física.</li>
+    <li>Destacar que o hardware é completamente <em>simulado em software</em>, mas o código do SO não sabe disso — ele interage com a CPU e a memória como se fossem reais.</li>
+    <li>Apontar a separação de responsabilidades: CPU não sabe de processos, MemoryManager não sabe de CPU.</li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 3. HARDWARE ══════════════════════════ -->
+<section id="hardware">
+<h2>3. Camada de Hardware Simulado (<code>Sistema.java</code>)</h2>
+
+<p>Toda a simulação de hardware reside em <code>src/system/Sistema.java</code>. A classe usa <em>inner classes</em> para agrupar logicamente os componentes de hardware, mantendo acesso privilegiado entre eles sem expor detalhes ao SO.</p>
+
+<!-- 3.1 Memória -->
+<h3>3.1 Memória (<code>Memory</code>)</h3>
+
+<p>A RAM é modelada como um vetor de <code>Word</code>. O tamanho padrão é <strong>1.024 palavras</strong>. Cada posição é inicializada com o opcode <code>___</code> (nulo), indicando memória não usada.</p>
+
+<pre><code>public class Memory {
+    public Word[] pos; // pos[i] é a posição i da memória
+
+    public Memory(int size) {
+        pos = new Word[size];
+        for (int i = 0; i < pos.length; i++) {
+            pos[i] = new Word(Opcode.___, -1, -1, -1); // inicializa como vazia
+        }
+    }
+}</code></pre>
+
+<div class="callout tip">
+  <div class="callout-title">Detalhe importante</div>
+  A memória <em>não distingue</em> código de dados — toda posição é um <code>Word</code>. O opcode <code>DATA</code> sinaliza que aquela posição contém um dado (não deve ser executada como instrução). Isso reflete a arquitetura de Von Neumann.
+</div>
+
+<!-- 3.2 Word -->
+<h3>3.2 Palavra (<code>Word</code>)</h3>
+
+<p>Cada célula de memória é uma <strong>instrução de 4 campos</strong>. Essa estrutura unificada permite que a CPU leia tanto instruções quanto dados do mesmo array.</p>
+
+<pre><code>public static class Word {
+    public Opcode opc; // operação a realizar
+    public int ra;     // registrador destino (ou primeiro operando)
+    public int rb;     // registrador fonte (ou segundo operando)
+    public int p;      // parâmetro imediato (endereço, constante ou dado)
+
+    public Word(Opcode _opc, int _ra, int _rb, int _p) {
+        opc = _opc; ra = _ra; rb = _rb; p = _p;
+    }
+}</code></pre>
+
+<p>Exemplo: <code>new Word(Opcode.LDI, 0, -1, 7)</code> representa a instrução <strong>r[0] ← 7</strong>. Campos não usados recebem <code>-1</code>.</p>
+
+<!-- 3.3 CPU -->
+<h3>3.3 CPU e Ciclo de Instrução</h3>
+
+<p>A CPU implementa o ciclo clássico <strong>Fetch → Decode → Execute → Verificar Interrupção</strong>. Ela possui 10 registradores de uso geral, PC, IR e uma flag de interrupção.</p>
+
+<pre><code>public class CPU {
+    private int pc;           // Program Counter (endereço lógico atual)
+    private Word ir;          // Instruction Register
+    private int[] reg;        // 10 registradores de uso geral (reg[8] e reg[9] para I/O)
+    private Interrupts irpt;  // sinaliza interrupção durante a execução
+
+    private int pageSize;     // tamanho de página (para tradução de endereços)
+    private PCB currentProcess; // processo em execução (para acessar tabela de páginas)
+
+    public void run(PCB runningProcess, boolean isExecAll) {
+        this.currentProcess = runningProcess;
+        System.arraycopy(runningProcess.savedRegisters, 0, reg, 0, reg.length); // restaura contexto
+        Integer cicleLimit = 5; // quantum: máximo de instruções por rodada
+        Integer cicle = 0;
+        cpuStop = false;
+
+        while (!cpuStop) {
+            // --- Preempção por quantum (apenas em execAll) ---
+            if (isExecAll && cicle >= cicleLimit) {
+                sysCall.stop();
+                cpuStop = true;
+                System.arraycopy(reg, 0, runningProcess.savedRegisters, 0, reg.length); // salva contexto
+                processManager.pcbReadyList.add(runningProcess); // retorna à fila
+                break;
+            }
+
+            // --- FASE 1: FETCH ---
+            if (legal(pc)) {
+                ir = m[translate(pc)];    // busca instrução: traduz PC lógico → físico
+                runningProcess.processPc = pc; // salva PC no PCB
+
+                // --- FASE 2/3: DECODE + EXECUTE ---
+                switch (ir.opc) {
+                    case LDI: reg[ir.ra] = ir.p; pc++; break;
+                    case ADD:  reg[ir.ra] = reg[ir.ra] + reg[ir.rb]; testOverflow(reg[ir.ra]); pc++; break;
+                    case STD:
+                        if (legal(ir.p)) { m[translate(ir.p)].p = reg[ir.ra]; pc++; }
+                        break;
+                    case STOP: sysCall.stop(); cpuStop = true; break;
+                    // ... demais opcodes
+                }
+            }
+
+            // --- FASE 4: VERIFICAR INTERRUPÇÃO ---
+            if (irpt != Interrupts.noInterrupt) {
+                ih.handle(irpt);
+                cpuStop = true;
+            }
+            cicle++;
+        }
+
+        if (!interuption) runningProcess.status = ProcessStatus.FINISHED;
+    }
+}</code></pre>
+
+<div class="callout warn">
+  <div class="callout-title">Quantum de 5 instruções</div>
+  O limite de 5 ciclos só é aplicado quando <code>isExecAll = true</code>. No modo <code>exec</code> (processo único), a CPU roda até o processo terminar, encontrar erro ou chamar STOP.
+</div>
+
+<!-- 3.4 Opcodes -->
+<h3>3.4 Set de Instruções (Opcodes)</h3>
+
+<table>
+  <tr><th>Categoria</th><th>Instruções</th><th>Descrição</th></tr>
+  <tr>
+    <td>Especiais</td>
+    <td><code>DATA</code>, <code>___</code></td>
+    <td><code>DATA</code> = posição de dado (não executável); <code>___</code> = posição vazia</td>
+  </tr>
+  <tr>
+    <td>Desvios</td>
+    <td><code>JMP</code>, <code>JMPI</code>, <code>JMPIG</code>, <code>JMPIL</code>, <code>JMPIE</code>,<br><code>JMPIGK</code>, <code>JMPILK</code>, <code>JMPIEK</code>, <code>JMPIGT</code>,<br><code>JMPIM</code>, <code>JMPIGM</code>, <code>JMPILM</code>, <code>JMPIEM</code></td>
+    <td>Saltos condicionais e incondicionais; sufixo <strong>K</strong> = destino imediato, <strong>M</strong> = destino em memória</td>
+  </tr>
+  <tr>
+    <td>Aritméticas</td>
+    <td><code>ADDI</code>, <code>SUBI</code>, <code>ADD</code>, <code>SUB</code>, <code>MULT</code></td>
+    <td>Operações inteiras com detecção de overflow (-32767 a 32767)</td>
+  </tr>
+  <tr>
+    <td>Movimentação</td>
+    <td><code>LDI</code>, <code>LDD</code>, <code>STD</code>, <code>LDX</code>, <code>STX</code>, <code>MOVE</code></td>
+    <td>Carga de imediato, carga/armazenamento em memória (direto e indireto por registrador)</td>
+  </tr>
+  <tr>
+    <td>Sistema</td>
+    <td><code>SYSCALL</code>, <code>STOP</code></td>
+    <td><code>SYSCALL</code> = chamada de sistema (I/O); <code>STOP</code> = encerra processo</td>
+  </tr>
+</table>
+
+<!-- 3.5 Interrupções -->
+<h3>3.5 Tratamento de Interrupções</h3>
+
+<p>O mecanismo de interrupção é sinalizado pela flag <code>irpt</code> dentro do ciclo da CPU. Ao fim de cada instrução, a CPU verifica se uma interrupção foi gerada e desvia para o <code>InterruptHandling</code> do SO.</p>
+
+<pre><code>public enum Interrupts {
+    noInterrupt,         // nenhuma interrupção pendente
+    intEnderecoInvalido, // acesso fora do espaço do processo
+    intInstrucaoInvalida,// opcode DATA sendo executado, ou opcode desconhecido
+    intOverflow          // resultado aritmético fora da faixa [-32767, 32767]
+}
+
+// Verificação de endereço lógico válido:
+private boolean legal(int e) {
+    if (e >= 0 && currentProcess != null && e < currentProcess.pages.length * pageSize) {
+        return true;
+    } else {
+        irpt = Interrupts.intEnderecoInvalido;
+        return false;
+    }
+}</code></pre>
+
+<div class="pres-box">
+  <div class="pres-title">Pontos para apresentar nesta seção</div>
+  <ul>
+    <li>Demonstrar ao vivo o ciclo fetch-execute com o modo <code>traceOn</code> ativado — a CPU imprime cada instrução e o estado dos registradores.</li>
+    <li>Explicar por que <code>legal()</code> usa o espaço lógico do processo e não o endereço físico diretamente.</li>
+    <li>Mostrar a tabela de opcodes e ressaltar o prefixo <strong>K</strong> (imediato) vs <strong>M</strong> (indireto via memória).</li>
+    <li>Falar sobre overflow aritmético: a CPU simula um inteiro de 16 bits (-32767 a 32767).</li>
+  </ul>
+</div>
+
+<div class="q-box">
+  <div class="q-title">Possíveis perguntas do professor</div>
+  <ul>
+    <li>
+      <em>O que acontece quando a CPU acessa um endereço fora dos limites do processo?</em>
+      <div class="answer">A função <code>legal()</code> sinaliza <code>intEnderecoInvalido</code>. Ao fim do ciclo, o <code>InterruptHandling</code> é acionado e a execução do processo é interrompida.</div>
+    </li>
+    <li>
+      <em>Por que o overflow é tratado como interrupção e não como exceção Java?</em>
+      <div class="answer">Para simular fielmente o comportamento de hardware. Em processadores reais, overflow dispara uma interrupção que o SO pode tratar — ignorar, encerrar o processo ou sinalizar ao programa.</div>
+    </li>
+    <li>
+      <em>Como funciona o SYSCALL de I/O?</em>
+      <div class="answer">O programa carrega em <code>reg[8]</code> o tipo (1=leitura, 2=escrita) e em <code>reg[9]</code> o endereço lógico do dado. A instrução SYSCALL desvia para <code>SysCallHandling.handle()</code>, que imprime ou lê o valor.</div>
+    </li>
+    <li>
+      <em>Por que o PC é mantido como endereço lógico, não físico?</em>
+      <div class="answer">O processo "pensa" em endereços lógicos. O PC representa a posição no espaço de endereçamento virtual do processo. A tradução para físico acontece no momento do fetch, dentro de <code>translate(pc)</code>.</div>
+    </li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 4. GERENCIADOR DE MEMÓRIA ══════════════════════════ -->
+<section id="memoria">
+<h2>4. Gerenciador de Memória Física — T1-A</h2>
+
+<p>O pacote <code>memoria</code> implementa a paginação física. A memória é dividida em <strong>frames</strong> de tamanho fixo (padrão: 16 palavras). Processos recebem um conjunto de frames — não necessariamente contíguos — que formam suas <strong>páginas</strong>.</p>
+
+<div class="diagram">
+Memória Física (1024 words, 64 frames de 16 words cada)
+┌──────┬──────┬──────┬──────┬──────┬───  ───┬──────┐
+│  F0  │  F1  │  F2  │  F3  │  F4  │  ...   │ F63  │
+│ 0-15 │16-31 │32-47 │48-63 │64-79 │        │1008+ │
+└──────┴──────┴──────┴──────┴──────┴───  ───┴──────┘
+   ↑              ↑                     ↑
+Processo A      Processo A           Processo B
+ Página 0        Página 1             Página 0
+</div>
+
+<!-- 4.1 Frame -->
+<h3>4.1 Frame (<code>Frame.java</code>)</h3>
+
+<p>Um frame representa um bloco físico de memória. É a unidade básica de alocação.</p>
+
+<pre><code>public class Frame {
+    public static int indexCounter = 0; // contador global de frames
+    public int index;       // número único do frame (0 a 63)
+    public int start;       // endereço físico de início (ex: frame 2 → start=32)
+    public int end;         // endereço físico de fim   (ex: frame 2 → end=47)
+    public boolean isOccupied; // true se alocado a algum processo
+
+    public Frame(int start, int end) {
+        this.start = start;
+        this.end = end;
+        this.index = indexCounter++;
+        // isOccupied inicializa false por padrão
+    }
+}</code></pre>
+
+<p>Fórmula: frame de índice <code>f</code> ocupa posições físicas <code>[f × pageSize, (f+1) × pageSize − 1]</code>.</p>
+
+<!-- 4.2 Page -->
+<h3>4.2 Página (<code>Page.java</code>)</h3>
+
+<p>Uma <code>Page</code> associa uma página lógica do processo a um frame físico. É através da tabela de páginas (array <code>PCB.pages[]</code>) que a CPU realiza a tradução de endereços.</p>
+
+<pre><code>public class Page {
+    public Frame frame; // referência ao frame físico correspondente
+    Word[] words;       // cache das words (não essencial para execução)
+
+    public Page(Frame frame, int size) {
+        this.frame = frame;
+        this.words = new Word[size];
+    }
+}</code></pre>
+
+<!-- 4.3 MemoryManager -->
+<h3>4.3 Gerenciador de Memória (<code>MemoryManager.java</code>)</h3>
+
+<p>O <code>MemoryManager</code> mantém um vetor <code>frameControl[]</code> com todos os frames da memória. Ele é a única entidade autorizada a marcar frames como ocupados ou livres.</p>
+
+<pre><code>public class MemoryManager {
+    private int pageSize;
+    private Memory memory;
+    private Frame[] frameControl; // um Frame para cada bloco físico de pageSize words
+
+    public MemoryManager(Memory memory, int pageSize) {
+        this.memory = memory;
+        this.pageSize = pageSize;
+        this.frameControl = new Frame[memory.pos.length / pageSize]; // 1024/16 = 64
+        initializeFrameControl();
+    }
+
+    private void initializeFrameControl() {
+        for (int i = 0; i < frameControl.length; i++) {
+            // Frame i ocupa [i*pageSize, (i+1)*pageSize - 1]
+            frameControl[i] = new Frame(i * pageSize, ((i + 1) * pageSize) - 1);
+        }
+    }
+}</code></pre>
+
+<h4>Alocação: <code>allocate(nWords)</code></h4>
+
+<p>Calcula quantos frames são necessários para <code>nWords</code> palavras e retorna um array de <code>Page</code> com os frames alocados. Usa divisão com teto (<em>ceiling division</em>) para garantir que sobras caibam em um frame extra.</p>
+
+<pre><code>public Page[] allocate(int wordsSize) {
+    int numPages = (wordsSize + pageSize - 1) / pageSize; // teto: ex. 20 words / 16 = 2 frames
+
+    Frame[] available = getAvailableFrames(); // filtra frames com isOccupied == false
+    if (numPages > available.length) {
+        return null; // sem memória disponível
+    }
+
+    Page[] pages = new Page[numPages];
+    for (int i = 0; i < numPages; i++) {
+        available[i].isOccupied = true; // marca como ocupado
+        pages[i] = new Page(available[i], pageSize);
+    }
+    return pages;
+}
+
+public Frame[] getAvailableFrames() {
+    return Arrays.stream(frameControl)
+            .filter(frame -> !frame.isOccupied)
+            .toArray(Frame[]::new);
+}</code></pre>
+
+<h4>Liberação: <code>deallocate(pages[])</code></h4>
+
+<p>Libera todos os frames de um processo, zerando a memória física e marcando os frames como disponíveis.</p>
+
+<pre><code>public void deallocate(Page[] pages) {
+    for (Page page : pages) {
+        page.words = null;
+        page.frame.isOccupied = false;
+        // limpa a memória física do frame
+        for (int i = page.frame.start; i <= page.frame.end; i++) {
+            memory.pos[i] = new Word(Opcode.___, -1, -1, -1);
+        }
+    }
+}</code></pre>
+
+<div class="callout tip">
+  <div class="callout-title">Estratégia de alocação: First-Fit implícito</div>
+  O <code>getAvailableFrames()</code> retorna frames livres em ordem de índice. O <code>allocate()</code> usa sempre os primeiros da lista — comportamento equivalente ao <strong>First-Fit</strong>. Em cenários com muita fragmentação externa, isso poderia ser substituído por Best-Fit.
+</div>
+
+<div class="pres-box">
+  <div class="pres-title">Pontos para apresentar nesta seção</div>
+  <ul>
+    <li>Demonstrar visualmente a fragmentação: criar dois processos, remover o primeiro, criar um terceiro maior — os frames do primeiro ficam disponíveis para reutilização.</li>
+    <li>Mostrar o comando <code>dumpM</code> que exibe a quantidade de frames livres e ocupados.</li>
+    <li>Explicar por que usamos paginação em vez de segmentação ou alocação contígua.</li>
+    <li>Calcular ao vivo: programa com 20 instruções → ceil(20/16) = 2 frames necessários.</li>
+  </ul>
+</div>
+
+<div class="q-box">
+  <div class="q-title">Possíveis perguntas do professor</div>
+  <ul>
+    <li>
+      <em>Por que a divisão usa <code>(wordsSize + pageSize - 1) / pageSize</code> e não simplesmente <code>wordsSize / pageSize</code>?</em>
+      <div class="answer">A divisão inteira trunca para baixo. Se o programa tem 17 words e o frame tem 16, 17/16 = 1 (errado — faltaria 1 word). A fórmula de teto garante que o resto seja acomodado: (17+15)/16 = 2 frames.</div>
+    </li>
+    <li>
+      <em>O que acontece se não há frames livres suficientes?</em>
+      <div class="answer"><code>allocate()</code> retorna <code>null</code>. O <code>ProcessManager</code> detecta isso, imprime mensagem de erro e a criação do processo falha sem corromper o estado do sistema.</div>
+    </li>
+    <li>
+      <em>Por que os frames são zerados na liberação?</em>
+      <div class="answer">Para evitar vazamento de informação entre processos — um processo novo não deve ver dados do processo anterior. Em sistemas reais, isso é obrigatório por segurança.</div>
+    </li>
+    <li>
+      <em>Qual a diferença entre fragmentação interna e externa nesse modelo?</em>
+      <div class="answer">Fragmentação interna: o último frame de um processo pode estar parcialmente vazio (ex: 3 words usadas de 16). Fragmentação externa não existe em paginação pura — qualquer conjunto de frames livres pode ser usado.</div>
+    </li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 5. GERENCIADOR DE PROCESSOS ══════════════════════════ -->
+<section id="processos">
+<h2>5. Gerenciador de Processos — T1-B</h2>
+
+<!-- 5.1 PCB -->
+<h3>5.1 Process Control Block (<code>PCB.java</code>)</h3>
+
+<p>O PCB é a <strong>representação interna de um processo</strong> dentro do SO. Contém tudo que o sistema precisa saber sobre o processo para pausar e retomar sua execução.</p>
+
+<pre><code>public class PCB {
+    private static int idCounter = 0;   // PID auto-incremento global
+
+    public Integer id;                  // PID único do processo
+    public ProcessStatus status;        // estado atual (CREATED, READY, EXECUTING…)
+    public Frame[] frames;              // frames físicos alocados para este processo
+    public Page[] pages;                // tabela de páginas (mapeamento lógico → físico)
+    public Integer processPc;           // PC salvo (endereço lógico para retomar execução)
+    public int[] savedRegisters = new int[10]; // contexto dos 10 registradores (context switch)
+    private String programName;         // nome do programa (para exibição)
+
+    PCB() {
+        id = idCounter++;
+        status = ProcessStatus.CREATED;
+        programName = "unknown";
+    }
+
+    public void setFrames(Frame[] programFrames) {
+        frames = programFrames;
+        processPc = 0; // PC inicia em 0 (endereço lógico 0 = início do programa)
+    }
+
+    public void setPages(Page[] programPages) {
+        pages = programPages;
+    }
+}</code></pre>
+
+<div class="callout tip">
+  <div class="callout-title">Context Switch via savedRegisters</div>
+  Quando um processo é preemptado (quantum esgotado em <code>execAll</code>), a CPU copia <code>reg[]</code> para <code>pcb.savedRegisters[]</code> antes de liberar a CPU. Quando o processo retoma, os registradores são restaurados de <code>savedRegisters[]</code> antes de iniciar o ciclo.
+</div>
+
+<!-- 5.2 ProcessStatus -->
+<h3>5.2 Estados do Processo (<code>ProcessStatus.java</code>)</h3>
+
+<pre><code>public enum ProcessStatus {
+    CREATED,    // PCB criado, ainda não entrou na fila de prontos
+    READY,      // na fila de prontos, aguardando CPU
+    EXECUTING,  // usando a CPU neste momento
+    PAUSE,      // interrompido por preempção (quantum), voltará à fila
+    FINISHED    // terminou (STOP ou erro fatal) — será removido
+}</code></pre>
+
+<div class="diagram">
+             criar processo
+   ─────────────────────────────►  CREATED
+                                       │
+                          add à fila   │
+                          de prontos   ▼
+                                    READY ◄────────────┐
+                                       │               │
+                       escalonador     │               │ preempção
+                       seleciona       ▼               │ (quantum)
+                                  EXECUTING ──────────►┘
+                                       │
+                            STOP/erro  │
+                                       ▼
+                                   FINISHED
+</div>
+
+<!-- 5.3 ProcessManager -->
+<h3>5.3 Gerenciador de Processos (<code>ProcessManager.java</code>)</h3>
+
+<p>O <code>ProcessManager</code> é o coração do T1-B. Ele orquestra todos os aspectos do ciclo de vida de processos.</p>
+
+<h4>Criação de processo: <code>createProcess(name)</code></h4>
+
+<pre><code>public boolean createProcess(String programName) {
+    Word[] programImage = programs.retrieveProgram(programName); // busca programa em "disco"
+    if (programImage == null) {
+        System.out.println("[PM] Erro: Programa '" + programName + "' não encontrado.");
+        return false;
+    }
+    return createProcessFromImage(programImage, programName);
+}
+
+private boolean createProcessFromImage(Word[] programImage, String programName) {
+    // 1. Alocar páginas (e frames) no MemoryManager
+    Page[] programPages = memoryManager.allocate(programImage.length);
+    if (programPages == null) return false; // sem memória
+
+    // 2. Extrair os frames das páginas
+    Frame[] frames = getFramesPromPages(programPages);
+
+    // 3. Criar e configurar o PCB
+    PCB currentProgramPCB = new PCB();
+    currentProgramPCB.setProgramName(programName);
+    currentProgramPCB.setFrames(frames);   // seta frames e inicializa processPc = 0
+    currentProgramPCB.setPages(programPages);
+
+    // 4. Copiar o código para os frames físicos
+    loadProgramInMemory(currentProgramPCB, programImage);
+
+    // 5. Adicionar à fila de prontos
+    pcbReadyList.add(currentProgramPCB);
+    System.out.println("[PM] Processo criado: PID=" + currentProgramPCB.id);
+    return true;
+}</code></pre>
+
+<h4>Carregamento na memória: <code>loadProgramInMemory()</code></h4>
+
+<p>Copia as words do programa para os frames físicos em ordem, respeitando os limites de cada frame. Isso transforma o programa (que usa endereços lógicos contíguos) em código espalhado pela RAM física.</p>
+
+<pre><code>private void loadProgramInMemory(PCB currentProgramPCB, Word[] programImage) {
+    int frameSize = currentProgramPCB.frames[0].end - currentProgramPCB.frames[0].start + 1; // 16
+    int countWords = 0;
+
+    for (int i = 0; i < currentProgramPCB.frames.length; i++) {    // para cada frame
+        for (int j = 0; j < frameSize; j++) {                       // para cada posição no frame
+            if (countWords < programImage.length) {
+                memory.pos[currentProgramPCB.frames[i].start + j] = programImage[countWords];
+                countWords++;
+            }
+            // posições restantes no último frame ficam com Word(___, -1, -1, -1)
+        }
+    }
+}</code></pre>
+
+<h4>Execução: <code>executeProcess(pid, isExecAll)</code></h4>
+
+<pre><code>public void executeProcess(int pid, boolean isExecAll) {
+    PCB pcb = getProcess(pid);
+    if (pcb == null) { System.out.println("[PM] Processo não encontrado."); return; }
+
+    running = pcb;
+    pcb.status = ProcessStatus.EXECUTING;
+
+    int startAddress = pcb.processPc; // retoma de onde parou (0 na primeira vez)
+    cpu.setContext(startAddress);     // seta PC da CPU (endereço lógico)
+
+    pcbReadyList.remove(pcb);        // remove temporariamente da fila durante execução
+    cpu.run(running, isExecAll);     // executa (com ou sem quantum)
+
+    if (pcb.status == ProcessStatus.FINISHED) {
+        memoryManager.deallocate(running.pages); // libera memória automaticamente
+        System.out.println("[PM] Processo PID=" + pid + " finalizado.");
+        running = null;
+    } else {
+        System.out.println("[PM] Processo PID=" + pid + " interrompido.");
+        // processo voltou para pcbReadyList dentro da CPU (preempção)
+    }
+}
+
+// execAll: roda cada processo na fila até todos terminarem
+public void execAll() {
+    while (!pcbReadyList.isEmpty()) {
+        executeProcess(pcbReadyList.get(0).id, true);
+    }
+}</code></pre>
+
+<h4>Remoção: <code>dealocateProcess(id)</code></h4>
+
+<pre><code>public void dealocateProcess(int id) {
+    PCB currentPCB = pcbReadyList.stream()
+            .filter(a -> a.id == id).findFirst().get(); // busca o processo
+
+    memoryManager.deallocate(currentPCB.pages); // libera frames
+    pcbReadyList.remove(currentPCB);             // remove da fila
+    dealocateProcessInMemory(currentPCB);        // zera a memória física
+}
+
+private void dealocateProcessInMemory(PCB currentPCB) {
+    int frameSize = currentPCB.frames[0].end - currentPCB.frames[0].start + 1;
+    for (int i = 0; i < currentPCB.frames.length; i++) {
+        for (int j = 0; j < frameSize; j++) {
+            memory.pos[currentPCB.frames[i].start + j] = new Word(Opcode.___, -1, -1, -1);
+        }
+    }
+}</code></pre>
+
+<div class="callout warn">
+  <div class="callout-title">Nota de implementação</div>
+  A memória é limpa tanto em <code>MemoryManager.deallocate()</code> quanto em <code>dealocateProcessInMemory()</code>. Há uma sobreposição — na prática, uma das duas é redundante. Isso não causa erro, apenas limpeza dupla.
+</div>
+
+<div class="pres-box">
+  <div class="pres-title">Pontos para apresentar nesta seção</div>
+  <ul>
+    <li>Mostrar o diagrama de estados do processo e percorrer cada transição com exemplos de comandos.</li>
+    <li>Demonstrar ao vivo: <code>new fatorial</code> → <code>ps</code> (vê status CREATED/READY) → <code>exec 0</code> → processo vai para FINISHED.</li>
+    <li>Enfatizar o salvamento de contexto: executar <code>execAll</code> com dois processos e mostrar que cada um retoma do ponto correto.</li>
+    <li>Mostrar que o PCB é o "passaporte" do processo: sem ele, a CPU não saberia por onde continuar.</li>
+  </ul>
+</div>
+
+<div class="q-box">
+  <div class="q-title">Possíveis perguntas do professor</div>
+  <ul>
+    <li>
+      <em>O que é um PCB e quais informações mínimas ele precisa conter?</em>
+      <div class="answer">PCB = Process Control Block. É a estrutura de dados que o SO usa para representar um processo. Mínimo necessário: PID, estado, PC salvo, registradores salvos, tabela de páginas (ou ponteiro para ela) e informações de scheduling.</div>
+    </li>
+    <li>
+      <em>Como o processo é "pausado" e "retomado" corretamente?</em>
+      <div class="answer">Pausa: a CPU salva <code>reg[]</code> em <code>pcb.savedRegisters[]</code> e o PC lógico em <code>pcb.processPc</code>. Retomada: <code>cpu.setContext(pcb.processPc)</code> restaura o PC, e <code>System.arraycopy(savedRegisters, reg)</code> restaura os registradores.</div>
+    </li>
+    <li>
+      <em>O que acontece se tentarmos fazer <code>rm</code> de um processo em execução?</em>
+      <div class="answer">A implementação atual busca o processo apenas na <code>pcbReadyList</code>. Um processo em execução está em <code>running</code>, fora da lista, então <code>findFirst().get()</code> lançaria <code>NoSuchElementException</code>. Uma melhoria seria verificar <code>running</code> também.</div>
+    </li>
+    <li>
+      <em>Por que o processo é removido da fila de prontos antes de executar?</em>
+      <div class="answer">Para evitar que o mesmo processo seja selecionado novamente durante a execução (especialmente em <code>execAll</code>). Ele só retorna à fila se for preemptado — caso contrário, termina e é descartado.</div>
+    </li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 6. TRADUÇÃO DE ENDEREÇOS ══════════════════════════ -->
+<section id="traducao">
+<h2>6. Tradução de Endereços Lógicos em Físicos</h2>
+
+<p>Este é o núcleo conceitual do trabalho — a ponte entre o que o programa enxerga (endereços lógicos contíguos) e o que a RAM física possui (frames espalhados).</p>
+
+<h3>6.1 Fórmula de Tradução</h3>
+
+<div class="diagram">
+Endereço lógico  →  número da página + offset  →  endereço físico
+
+  endereçoLógico = 34
+  pageSize = 16
+
+  página  = 34 / 16 = 2          (índice da página na tabela)
+  offset  = 34 % 16 = 2          (posição dentro do frame)
+
+  frame físico da página 2 = pages[2].frame.start = 48  (ex: processo em frames 0, 1, 2)
+
+  endereçoFísico = 48 + 2 = 50
+</div>
+
+<h3>6.2 Implementação na CPU</h3>
+
+<pre><code>// Na classe CPU (Sistema.java):
+public int translate(int logicalAddr) {
+    int page   = logicalAddr / pageSize;           // qual página lógica
+    int offset = logicalAddr % pageSize;           // posição dentro da página
+    return currentProcess.pages[page].frame.start + offset; // endereço físico
+}
+
+// Uso no fetch da instrução:
+ir = m[translate(pc)];  // busca instrução no endereço físico correspondente ao PC lógico
+
+// Uso em LDD (load direto):
+case LDD: // Rd <- [A] — A é endereço lógico
+    if (legal(ir.p)) {
+        reg[ir.ra] = m[translate(ir.p)].p; // traduz antes de acessar a memória
+        pc++;
+    }
+    break;</code></pre>
+
+<h3>6.3 Verificação de Acesso (<code>legal()</code>)</h3>
+
+<p>Antes de qualquer tradução, a CPU verifica se o endereço lógico está dentro dos limites do processo. Isso previne que um processo acesse memória de outro processo.</p>
+
+<pre><code>private boolean legal(int e) {
+    // e é um endereço lógico
+    // o espaço total do processo = número de páginas × tamanho da página
+    if (e >= 0 && currentProcess != null && e < currentProcess.pages.length * pageSize) {
+        return true;
+    } else {
+        irpt = Interrupts.intEnderecoInvalido; // dispara interrupção de segmentation fault
+        return false;
+    }
+}</code></pre>
+
+<h3>6.4 Exemplo Completo</h3>
+
+<p>Processo com programa de 18 words, pageSize = 16. Alocação obtém os frames 3 e 7 (endereços físicos 48–63 e 112–127).</p>
+
+<table>
+  <tr><th>Endereço Lógico</th><th>Página</th><th>Offset</th><th>Frame Físico</th><th>Endereço Físico</th></tr>
+  <tr><td>0</td><td>0</td><td>0</td><td>3 (start=48)</td><td>48</td></tr>
+  <tr><td>15</td><td>0</td><td>15</td><td>3 (start=48)</td><td>63</td></tr>
+  <tr><td>16</td><td>1</td><td>0</td><td>7 (start=112)</td><td>112</td></tr>
+  <tr><td>17</td><td>1</td><td>1</td><td>7 (start=112)</td><td>113</td></tr>
+</table>
+
+<div class="pres-box">
+  <div class="pres-title">Pontos para apresentar nesta seção</div>
+  <ul>
+    <li>Este é o ponto central do trabalho — dedicar tempo suficiente para explicar a fórmula de tradução.</li>
+    <li>Mostrar com um diagrama desenhado à mão (ou no slide): programa contíguo no papel → frames espalhados na RAM.</li>
+    <li>Conectar com o conceito de TLB (Translation Lookaside Buffer) em sistemas reais — aqui não implementamos TLB, então toda tradução é feita pela tabela de páginas.</li>
+    <li>Demonstrar ao vivo com <code>traceOn</code>: a CPU mostra o PC lógico, e o <code>dump</code> mostra os frames físicos onde o código está.</li>
+  </ul>
+</div>
+
+<div class="q-box">
+  <div class="q-title">Possíveis perguntas do professor</div>
+  <ul>
+    <li>
+      <em>O que é a fragmentação interna nesse modelo e onde ela ocorre?</em>
+      <div class="answer">No último frame de um processo: se o programa tem 17 words e o frame tem 16, o segundo frame tem apenas 1 word usada e 15 desperdiçadas. Esse desperdício = fragmentação interna. Frames intermediários não têm fragmentação.</div>
+    </li>
+    <li>
+      <em>Como a paginação garante proteção entre processos?</em>
+      <div class="answer">Cada processo tem sua própria tabela de páginas (<code>PCB.pages[]</code>). A CPU usa apenas essa tabela para traduzir endereços. Um processo com páginas mapeadas para frames F0 e F1 nunca "enxerga" frames F2+ de outro processo, pois seu espaço lógico acaba no limite de suas páginas — qualquer acesso além disso é barrado por <code>legal()</code>.</div>
+    </li>
+    <li>
+      <em>Qual seria a complexidade de adicionar memória virtual (swap) a esse sistema?</em>
+      <div class="answer">Precisaríamos adicionar: bit de validade na tabela de páginas, rotina de page fault, área de swap em disco (simulado), e algoritmo de substituição (LRU, Clock…). O projeto já inclui <code>GerenciadorMemoriaVirtual.java</code> como extensão opcional com algoritmo Second Chance.</div>
+    </li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 7. CLI ══════════════════════════ -->
+<section id="cli">
+<h2>7. Interface de Linha de Comando (<code>Main.java</code>)</h2>
+
+<p>O <code>Main.java</code> é o <strong>shell do sistema operacional simulado</strong>. Inicializa todos os componentes e entra em um loop de comandos que permite ao usuário interagir com o sistema.</p>
+
+<h3>7.1 Inicialização</h3>
+
+<pre><code>public static void main(String[] args) {
+    int memorySize = 1024;
+    int pageSize   = 16;
+
+    sistema       = new Sistema(memorySize);             // cria HW: CPU + RAM
+    memoryManager = new MemoryManager(sistema.hw.mem, pageSize); // divide RAM em 64 frames
+    processManager = new ProcessManager(
+        sistema.hw.mem, memoryManager,
+        sistema.hw.cpu, sistema.progs);                 // wires todos os subsistemas
+
+    sistema.setProcessManager(processManager);
+    sistema.setMemoryManager(memoryManager);
+
+    sistema.hw.cpu.setAddressOfHandlers(sistema.so.ih, sistema.so.sc); // registra handlers de int/syscall
+    sistema.hw.cpu.setUtilities(sistema.so.utils);
+    sistema.hw.cpu.setPageSize(pageSize);
+}</code></pre>
+
+<h3>7.2 Comandos Disponíveis</h3>
+
+<table>
+  <tr><th>Comando</th><th>Ação</th><th>Método chamado</th></tr>
+  <tr><td><code>new &lt;prog&gt;</code></td><td>Cria e carrega um processo na RAM</td><td><code>processManager.createProcess(name)</code></td></tr>
+  <tr><td><code>rm &lt;pid&gt;</code></td><td>Remove processo e libera memória</td><td><code>processManager.dealocateProcess(pid)</code></td></tr>
+  <tr><td><code>ps</code></td><td>Lista processos, PIDs e status</td><td><code>processManager.listProcesses()</code></td></tr>
+  <tr><td><code>exec &lt;pid&gt;</code></td><td>Executa processo até terminar ou errar</td><td><code>processManager.executeProcess(pid, false)</code></td></tr>
+  <tr><td><code>execAll</code></td><td>Executa todos os processos na fila com quantum de 5</td><td><code>processManager.execAll()</code></td></tr>
+  <tr><td><code>dump</code></td><td>Imprime toda a RAM (todas as 1024 words)</td><td><code>sistema.so.utils.dump(0, 1024)</code></td></tr>
+  <tr><td><code>dumpM</code></td><td>Mostra frames livres e ocupados</td><td><code>memoryManager.getAvailableFrames()</code></td></tr>
+  <tr><td><code>traceOn/Off</code></td><td>Liga/desliga log detalhado da CPU</td><td><code>sistema.hw.cpu.setDebug(true/false)</code></td></tr>
+  <tr><td><code>exit</code></td><td>Encerra o sistema</td><td>—</td></tr>
+</table>
+
+<div class="pres-box">
+  <div class="pres-title">Pontos para apresentar nesta seção</div>
+  <ul>
+    <li>Fazer uma demo ao vivo do fluxo completo: <code>new fatorial</code> → <code>ps</code> → <code>traceOn</code> → <code>exec 0</code> → observar a CPU executar instrução a instrução → <code>dumpM</code>.</li>
+    <li>Mostrar que o shell é um <em>processo especial</em> que não usa a CPU simulada — ele roda na JVM. Isso corresponde ao "Thread Shell" do diagrama de T1-C.</li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 8. PROGRAMAS ══════════════════════════ -->
+<section id="programas">
+<h2>8. Programas de Teste</h2>
+
+<p>Os programas são arrays de <code>Word[]</code> estáticos definidos na classe <code>Programs</code> dentro de <code>Sistema.java</code>. Eles representam "programas em disco" que podem ser carregados para a RAM.</p>
+
+<table>
+  <tr><th>Programa</th><th>Tamanho</th><th>O que faz</th><th>Usa SYSCALL?</th></tr>
+  <tr><td><code>fatorial</code></td><td>11 words</td><td>Calcula 7! com loop e registradores. Resultado em pos[10]</td><td>Não</td></tr>
+  <tr><td><code>fatorialV2</code></td><td>20 words</td><td>Versão aprimorada: trata negativos, escreve resultado com SYSCALL</td><td>Sim (saída)</td></tr>
+  <tr><td><code>progMinimo</code></td><td>14 words</td><td>Escreve valor 999 em 5 posições de memória. Teste básico de STD</td><td>Não</td></tr>
+  <tr><td><code>fibonacci10</code></td><td>30 words</td><td>Calcula série de Fibonacci com 10 termos, armazena em memória</td><td>Não</td></tr>
+  <tr><td><code>fibonacci10v2</code></td><td>33 words</td><td>Versão alternativa usando MOVE em vez de ADD+LDI</td><td>Não</td></tr>
+  <tr><td><code>fibonacciREAD</code></td><td>55 words</td><td>Lê tamanho da série via SYSCALL e gera N termos de Fibonacci</td><td>Sim (entrada e saída)</td></tr>
+  <tr><td><code>PB</code></td><td>16 words</td><td>Se número positivo → calcula fatorial; se negativo → retorna -1</td><td>Não</td></tr>
+  <tr><td><code>PC</code></td><td>54 words</td><td>Ordena vetor de 5 elementos com Bubble Sort</td><td>Não</td></tr>
+</table>
+
+<h3>8.1 Exemplo Anotado: <code>fatorial</code></h3>
+
+<pre><code>new Word(Opcode.LDI,  0, -1,  7),  // pos 0: r0 = 7  (número a calcular)
+new Word(Opcode.LDI,  1, -1,  1),  // pos 1: r1 = 1  (acumulador do produto)
+new Word(Opcode.LDI,  6, -1,  1),  // pos 2: r6 = 1  (constante de decremento)
+new Word(Opcode.LDI,  7, -1,  8),  // pos 3: r7 = 8  (endereço do STD, destino do JMP)
+new Word(Opcode.JMPIE,7,  0,  0),  // pos 4: se r0 == 0, PC = r7 (= 8), sai do loop
+new Word(Opcode.MULT, 1,  0, -1),  // pos 5: r1 = r1 * r0
+new Word(Opcode.SUB,  0,  6, -1),  // pos 6: r0 = r0 - r6  (r0--)
+new Word(Opcode.JMP, -1, -1,  4),  // pos 7: PC = 4  (volta ao teste)
+new Word(Opcode.STD,  1, -1, 10),  // pos 8: mem[10] = r1  (salva resultado)
+new Word(Opcode.STOP,-1, -1, -1),  // pos 9: fim
+new Word(Opcode.DATA,-1, -1, -1)   // pos 10: slot de dado (resultado aqui)</code></pre>
+
+<p>Execução para n=7: r1 acumula 7→42→210→840→2520→5040 = 5040 = 7!</p>
+
+<h3>8.2 Exemplo: <code>PC</code> (Bubble Sort)</h3>
+
+<p>O mais complexo dos programas. Usa desvios indiretos via memória (<code>JMPILM</code>, <code>JMPIGM</code>, <code>JMPIEM</code>) para implementar os dois laços aninhados do Bubble Sort. Posições 96–99 armazenam os endereços de salto das chaves, tornando o código automodificável em espírito.</p>
+
+<div class="pres-box">
+  <div class="pres-title">Pontos para apresentar nesta seção</div>
+  <ul>
+    <li>Mostrar o <code>fatorial</code> passo a passo com <code>traceOn</code> — é o mais didático para explicar o ciclo da CPU.</li>
+    <li>Ressaltar que os programas usam apenas endereços lógicos — a tradução é invisível para eles.</li>
+    <li>Mostrar que <code>fibonacciREAD</code> usa <code>SYSCALL</code> para I/O — conecta com o conceito de chamada de sistema.</li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 9. ESCALONADOR ══════════════════════════ -->
+<section id="scheduler">
+<h2>9. Escalonamento — T1-C (Visão Futura)</h2>
+
+<p>O T1-C adiciona o escalonador Round-Robin completo. A base já está preparada no código atual:</p>
+
+<ul>
+  <li><strong>Quantum de 5 instruções:</strong> implementado no loop da CPU (<code>cicleLimit = 5</code>)</li>
+  <li><strong>Salvamento de contexto:</strong> <code>savedRegisters[]</code> e <code>processPc</code> já são salvos na preempção</li>
+  <li><strong>Retorno à fila:</strong> processo preemptado é re-inserido em <code>pcbReadyList</code></li>
+  <li><strong>execAll:</strong> já implementa Round-Robin sequencial de forma simplificada</li>
+</ul>
+
+<p>O que T1-C precisa adicionar:</p>
+
+<ol>
+  <li><strong>Interrupção de timer real:</strong> disparada automaticamente após N ciclos, não apenas quando <code>isExecAll=true</code></li>
+  <li><strong>Thread separada para CPU:</strong> CPU em thread própria, bloqueada em semáforo, desbloqueada pelo escalonador</li>
+  <li><strong>Thread do escalonador:</strong> acordada pela interrupção de timer, seleciona próximo processo</li>
+  <li><strong>Fila de bloqueados:</strong> para processos aguardando I/O</li>
+</ol>
+
+<div class="diagram">
+Thread Shell  │  Thread CPU          │  Thread Escalonador
+──────────────┼──────────────────────┼──────────────────────
+new fatorial  │  wait(semaCPU)       │  wait(semaSch)
+exec 0        │  ← signal(semaCPU)  │
+              │  [executa instruções]│
+              │  [timer interrupt]   │
+              │  → signal(semaSch)  │  ← acorda
+              │  save context        │  seleciona próximo
+              │  wait(semaCPU)       │  signal(semaCPU) →
+</div>
+
+<div class="q-box">
+  <div class="q-title">Possíveis perguntas do professor (T1-C)</div>
+  <ul>
+    <li>
+      <em>O que é Round-Robin e por que usar quantum?</em>
+      <div class="answer">Round-Robin é um algoritmo de escalonamento preemptivo que aloca uma fatia de tempo (quantum) igual para cada processo na fila circular. Quantum garante que nenhum processo monopolize a CPU — essencial para sistemas interativos.</div>
+    </li>
+    <li>
+      <em>Qual o impacto do tamanho do quantum no desempenho?</em>
+      <div class="answer">Quantum muito pequeno: muitos context switches, overhead alto. Quantum muito grande: comportamento similar a FIFO, menor responsividade. O valor ótimo depende do tempo médio de burst de CPU dos processos.</div>
+    </li>
+    <li>
+      <em>Por que usar semáforos entre as threads?</em>
+      <div class="answer">Para sincronização: a Thread CPU não pode executar sem que o escalonador a autorize, e o escalonador não pode selecionar um processo enquanto a CPU está executando. Semáforos garantem exclusão mútua e coordenação de ordem.</div>
+    </li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ══════════════════════════ 10. FLUXO COMPLETO ══════════════════════════ -->
+<section id="fluxo">
+<h2>10. Fluxo Completo de uma Execução</h2>
+
+<p>Passo a passo do que acontece quando o usuário digita <code>new fatorial</code> seguido de <code>exec 0</code>:</p>
+
+<div class="diagram">
+Usuário digita: new fatorial
+│
+├─ Main.handleNew("fatorial")
+│   └─ processManager.createProcess("fatorial")
+│       ├─ programs.retrieveProgram("fatorial")  → Word[11]
+│       ├─ memoryManager.allocate(11)
+│       │   ├─ numPages = ceil(11/16) = 1
+│       │   ├─ getAvailableFrames() → [F0, F1, ..., F63]
+│       │   ├─ F0.isOccupied = true
+│       │   └─ retorna Page[1] { pages[0] → frame F0 (0-15) }
+│       ├─ new PCB() { id=0, status=CREATED, processPc=0 }
+│       ├─ pcb.setPages(pages) → pcb.pages[0].frame = F0
+│       ├─ loadProgramInMemory: copia Word[11] para mem.pos[0..10]
+│       └─ pcbReadyList.add(pcb) → fila: [PID=0]
+
+Usuário digita: exec 0
+│
+├─ Main.handleExec(0)
+│   └─ processManager.executeProcess(0, false)
+│       ├─ pcb = pcbReadyList.get(0)  // PID=0
+│       ├─ running = pcb
+│       ├─ pcb.status = EXECUTING
+│       ├─ cpu.setContext(0)  // PC lógico = 0
+│       ├─ pcbReadyList.remove(pcb)
+│       └─ cpu.run(pcb, false)
+│           ├─ restaura savedRegisters → reg[] (todos 0)
+│           │
+│           ├─ CICLO 1: pc=0
+│           │   ├─ legal(0)? → 0 < 1*16 ✓
+│           │   ├─ translate(0): página=0, offset=0, físico = F0.start+0 = 0
+│           │   ├─ ir = mem[0] = LDI r0, 7
+│           │   ├─ execute: reg[0] = 7
+│           │   └─ pc = 1
+│           │
+│           ├─ ... (ciclos 2 a 7: loop fatorial)
+│           │
+│           ├─ CICLO N: STOP encontrado
+│           │   ├─ sysCall.stop() → imprime "SYSCALL STOP"
+│           │   └─ cpuStop = true
+│           │
+│           └─ pcb.status = FINISHED (não foi interrupção)
+│
+├─ memoryManager.deallocate(pcb.pages) → F0 livre
+└─ running = null
+</div>
+
+</section>
+
+<footer>
+  <p>SysOp &mdash; Simulador de Sistema Operacional &mdash; PUCRS Engenharia de Software</p>
+  <p>Disciplina: Sistemas Operacionais &mdash; Prof. Fernando Dotti &mdash; Trabalho T1 (A+B)</p>
+  <p style="margin-top:8px; color:#a0aec0;">Documentação gerada para apresentação acadêmica &mdash; 2026</p>
+</footer>
+
+</div><!-- /container -->
+</body>
+</html>

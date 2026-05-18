@@ -29,6 +29,7 @@ public class Main {
 
         sistema.hw.cpu.setAddressOfHandlers(sistema.so.ih, sistema.so.sc);
         sistema.hw.cpu.setUtilities(sistema.so.utils);
+        sistema.hw.cpu.setPageSize(pageSize);
 
         scanner = new Scanner(System.in);
         System.out.println("=== Sistema Operacional Simulado ===");
