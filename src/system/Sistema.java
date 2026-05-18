@@ -195,10 +195,9 @@ public class Sistema {
 						break;
 					}
 				}
-				// --------------------------------------------------------------------------------------------------
-				// FASE DE FETCH
+
 				if (legal(pc)) { // pc valido (endereço lógico)
-					ir = m[translate(pc)];  // traduz pc lógico → físico para buscar instrução
+					ir = m[translate(pc)];
 					runningProcess.processPc = pc;             // salva pc lógico no PCB
 					if (debug) {
 						System.out.print("                                              regs: ");
@@ -213,12 +212,10 @@ public class Sistema {
 						u.dump(ir);
 					}
 
-				// --------------------------------------------------------------------------------------------------
-				// FASE DE EXECUCAO DA INSTRUCAO CARREGADA NO ir
 					switch (ir.opc) {       // conforme o opcode (código de operação) executa
 
 						// Instrucoes de Busca e Armazenamento em Memoria
-						case LDI: // Rd ← k        veja a tabela de instrucoes do HW simulado para entender a semantica da instrucao
+						case LDI:
 							reg[ir.ra] = ir.p;
 							pc++;
 							break;
@@ -391,8 +388,6 @@ public class Sistema {
 							break;
 					}
 				}
-				// --------------------------------------------------------------------------------------------------
-				// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
 				if (irpt != Interrupts.noInterrupt) { // existe interrupção
 					ih.handle(irpt);                  // desvia para rotina de tratamento - esta rotina é do SO
 					cpuStop = true;                   // nesta versao, para a CPU
