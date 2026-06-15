@@ -20,6 +20,11 @@ package system;// PUCRS - Escola Politécnica - Sistemas Operacionais
 //    Veja o main.  Ele instancia o system.Sistema com os elementos mencionados acima.
 //           em seguida solicita a execução de algum programa com  loadAndExec
 
+import ProcessManager.PCB;
+import ProcessManager.ProcessManager;
+import memoria.MemoryManager;
+import ProcessManager.ProcessStatus;
+
 public class Sistema {
 
 	// -------------------------------------------------------------------------------------------------------
@@ -29,6 +34,18 @@ public class Sistema {
 	// -------------------------------------------------------------------------------------------------------
 	// --------------------- M E M O R I A - definicoes de palavra de memoria,
 	// memória ----------------------
+
+	private ProcessManager processManager;
+
+	public void setMemoryManager(MemoryManager memoryManager) {
+		this.memoryManager = memoryManager;
+	}
+
+	public void setProcessManager(ProcessManager processManager) {
+		this.processManager = processManager;
+	}
+
+	private MemoryManager memoryManager;
 
 	public class Memory {
 		public Word[] pos; // pos[i] é a posição i da memória. cada posição é uma palavra.
@@ -42,7 +59,7 @@ public class Sistema {
 		}
 	}
 
-	public class Word {    // cada posicao da memoria tem uma instrucao (ou um dado)
+	public static class Word {    // cada posicao da memoria tem uma instrucao (ou um dado)
 		public Opcode opc; //
 		public int ra;     // indice do primeiro registrador da operacao (Rs ou Rd cfe opcode na tabela)
 		public int rb;     // indice do segundo registrador da operacao (Rc ou Rs cfe operacao)
@@ -98,6 +115,9 @@ public class Sistema {
 		private boolean debug;      // se true entao mostra cada instrucao em execucao
 		private Utilities u;        // para debug (dump)
 
+		private PCB currentProcess; // processo em execução (usado para tradução de endereços)
+		private int pageSize;       // tamanho da página, injetado pelo Main
+
 		public CPU(Memory _mem, boolean _debug) { // ref a MEMORIA passada na criacao da CPU
 			maxInt = 32767;            // capacidade de representacao modelada
 			minInt = -32767;           // se exceder deve gerar interrupcao de overflow
@@ -117,11 +137,24 @@ public class Sistema {
 			u = _u;                     // aponta para rotinas utilitárias - fazer dump da memória na tela
 		}
 
+		public void setDebug(boolean _debug) {
+			debug = _debug;
+		}
+
+		public void setPageSize(int size) {
+			pageSize = size;
+		}
+
+		// Tradução de endereço lógico → físico usando a tabela de páginas do processo atual
+		public int translate(int logicalAddr) {
+			int page   = logicalAddr / pageSize;
+			int offset = logicalAddr % pageSize;
+			return currentProcess.pages[page].frame.start + offset;
+		}
 
                                        // verificação de enderecamento 
-		private boolean legal(int e) { // todo acesso a memoria tem que ser verificado se é válido - 
-			                           // aqui no caso se o endereco é um endereco valido em toda memoria
-			if (e >= 0 && e < m.length) {
+		private boolean legal(int e) { // verifica se endereço lógico é válido para o processo atual
+			if (e >= 0 && currentProcess != null && e < currentProcess.pages.length * pageSize) {
 				return true;
 			} else {
 				irpt = Interrupts.intEnderecoInvalido;    // se nao for liga interrupcao no meio da exec da instrucao
@@ -144,16 +177,28 @@ public class Sistema {
 			irpt = Interrupts.noInterrupt;                // reset da interrupcao registrada
 		}
 
-		public void run() {                               // execucao da CPU supoe que o contexto da CPU, vide acima, 
-														  // esta devidamente setado
+		public void run(PCB runningProcess, boolean isExecAll) {                               // execucao da CPU supoe que o contexto da CPU, vide acima,
+			this.currentProcess = runningProcess;
+			System.arraycopy(runningProcess.savedRegisters, 0, reg, 0, reg.length); // restaura contexto de registradores
+			Integer cicleLimit = 5;
+			Integer cicle = 0;
 			cpuStop = false;
+			boolean interuption = false;
 			while (!cpuStop) {      // ciclo de instrucoes. acaba cfe resultado da exec da instrucao, veja cada caso.
+				if(isExecAll){
+					if (cicle >= cicleLimit) {
+						sysCall.stop();
+						cpuStop = true;
+						System.arraycopy(reg, 0, runningProcess.savedRegisters, 0, reg.length); // salva registradores
+						processManager.pcbReadyList.add(runningProcess);
+						interuption = true;
+						break;
+					}
+				}
 
-				// --------------------------------------------------------------------------------------------------
-				// FASE DE FETCH
-				if (legal(pc)) { // pc valido
-					ir = m[pc];  // <<<<<<<<<<<< AQUI faz FETCH - busca posicao da memoria apontada por pc, guarda em ir
-					             // resto é dump de debug
+				if (legal(pc)) { // pc valido (endereço lógico)
+					ir = m[translate(pc)];
+					runningProcess.processPc = pc;             // salva pc lógico no PCB
 					if (debug) {
 						System.out.print("                                              regs: ");
 						for (int i = 0; i < 10; i++) {
@@ -167,45 +212,42 @@ public class Sistema {
 						u.dump(ir);
 					}
 
-				// --------------------------------------------------------------------------------------------------
-				// FASE DE EXECUCAO DA INSTRUCAO CARREGADA NO ir
 					switch (ir.opc) {       // conforme o opcode (código de operação) executa
 
 						// Instrucoes de Busca e Armazenamento em Memoria
-						case LDI: // Rd ← k        veja a tabela de instrucoes do HW simulado para entender a semantica da instrucao
+						case LDI:
 							reg[ir.ra] = ir.p;
 							pc++;
 							break;
 						case LDD: // Rd <- [A]
 							if (legal(ir.p)) {
-								reg[ir.ra] = m[ir.p].p;
+								reg[ir.ra] = m[translate(ir.p)].p;
 								pc++;
 							}
 							break;
 						case LDX: // RD <- [RS] // NOVA
 							if (legal(reg[ir.rb])) {
-								reg[ir.ra] = m[reg[ir.rb]].p;
+								reg[ir.ra] = m[translate(reg[ir.rb])].p;
 								pc++;
 							}
 							break;
 						case STD: // [A] ← Rs
 							if (legal(ir.p)) {
-								m[ir.p].opc = Opcode.DATA;
-								m[ir.p].p = reg[ir.ra];
+								m[translate(ir.p)].opc = Opcode.DATA;
+								m[translate(ir.p)].p = reg[ir.ra];
 								pc++;
-                                if (debug) 
-								    {   System.out.print("                                  ");   
-									    u.dump(ir.p,ir.p+1);							
+                                if (debug)
+								    {   System.out.print("                                  ");
+									    u.dump(translate(ir.p), translate(ir.p)+1);
 									}
 								}
 							break;
 						case STX: // [Rd] ←Rs
 							if (legal(reg[ir.ra])) {
-								m[reg[ir.ra]].opc = Opcode.DATA;
-								m[reg[ir.ra]].p = reg[ir.rb];
+								m[translate(reg[ir.ra])].opc = Opcode.DATA;
+								m[translate(reg[ir.ra])].p = reg[ir.rb];
 								pc++;
 							}
-							;
 							break;
 						case MOVE: // RD <- RS
 							reg[ir.ra] = reg[ir.rb];
@@ -243,7 +285,9 @@ public class Sistema {
 							pc = ir.p;
 							break;
 						case JMPIM: // PC <- [A]
-							      pc = m[ir.p].p;
+							if (legal(ir.p)) {
+								pc = m[translate(ir.p)].p;
+							}
 							break;
 						case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
 							if (reg[ir.rb] > 0) {
@@ -288,26 +332,30 @@ public class Sistema {
 							}
 							break;
 						case JMPIGM: // If RC > 0 then PC <- [A] else PC++
-						    if (legal(ir.p)){
-							    if (reg[ir.rb] > 0) {
-								   pc = m[ir.p].p;
-							    } else {
-								  pc++;
-							   }
-						    }
-							break;
-						case JMPILM: // If RC < 0 then PC <- k else PC++
-							if (reg[ir.rb] < 0) {
-								pc = m[ir.p].p;
-							} else {
-								pc++;
+							if (legal(ir.p)) {
+								if (reg[ir.rb] > 0) {
+									pc = m[translate(ir.p)].p;
+								} else {
+									pc++;
+								}
 							}
 							break;
-						case JMPIEM: // If RC = 0 then PC <- k else PC++
-							if (reg[ir.rb] == 0) {
-								pc = m[ir.p].p;
-							} else {
-								pc++;
+						case JMPILM: // If RC < 0 then PC <- [A] else PC++
+							if (legal(ir.p)) {
+								if (reg[ir.rb] < 0) {
+									pc = m[translate(ir.p)].p;
+								} else {
+									pc++;
+								}
+							}
+							break;
+						case JMPIEM: // If RC = 0 then PC <- [A] else PC++
+							if (legal(ir.p)) {
+								if (reg[ir.rb] == 0) {
+									pc = m[translate(ir.p)].p;
+								} else {
+									pc++;
+								}
 							}
 							break;
 						case JMPIGT: // If RS>RC then PC <- k else PC++
@@ -340,13 +388,18 @@ public class Sistema {
 							break;
 					}
 				}
-				// --------------------------------------------------------------------------------------------------
-				// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
 				if (irpt != Interrupts.noInterrupt) { // existe interrupção
 					ih.handle(irpt);                  // desvia para rotina de tratamento - esta rotina é do SO
 					cpuStop = true;                   // nesta versao, para a CPU
 				}
+
+				runningProcess.processPc = pc;
+				cicle++;
 			} // FIM DO CICLO DE UMA INSTRUÇÃO
+			if(!interuption){
+				runningProcess.status = ProcessStatus.FINISHED;
+			}
+
 		}
 	}
 	// ------------------ C P U - fim
@@ -416,8 +469,8 @@ public class Sistema {
 				  // leitura ...
 
 			} else if (hw.cpu.reg[8]==2){
-				  // escrita - escreve o conteuodo da memoria na posicao dada em reg[9]
-				  System.out.println("OUT:   "+ hw.mem.pos[hw.cpu.reg[9]].p);
+				  // escrita - escreve o conteudo da memoria na posicao lógica dada em reg[9]
+				  System.out.println("OUT:   "+ hw.mem.pos[hw.cpu.translate(hw.cpu.reg[9])].p);
 			} else {System.out.println("  PARAMETRO INVALIDO"); }		
 		}
 	}
@@ -472,7 +525,7 @@ public class Sistema {
 			dump(0, p.length); // dump da memoria nestas posicoes
 			hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
 			System.out.println("---------------------------------- inicia execucao ");
-			hw.cpu.run(); // cpu roda programa ate parar
+			hw.cpu.run(processManager.running, false); // cpu roda programa ate parar
 			System.out.println("---------------------------------- memoria após execucao ");
 			dump(0, p.length); // dump da memoria com resultado
 		}
@@ -550,7 +603,7 @@ public class Sistema {
 
 		public Word[] retrieveProgram(String pname) {
 			for (Program p : progs) {
-				if (p != null & p.name == pname)
+				if (p != null & p.name.equals(pname))
 					return p.image;
 			}
 			return null;

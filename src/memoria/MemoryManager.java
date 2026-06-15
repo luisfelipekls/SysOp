@@ -53,7 +53,7 @@ public class MemoryManager {
             page.frame.isOccupied = false;
 
             for(int i = page.frame.start; i <= page.frame.end; i++) {
-                memory.pos[i] = null;
+                memory.pos[i] = new Word(Opcode.___, -1, -1, -1);
             }
         }
     }
