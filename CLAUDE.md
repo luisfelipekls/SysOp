@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 The work is split into incremental parts, each building on the previous:
 
 - **T1-A — Memory Manager (GM)**: Physical paging — allocate/deallocate frames, load program into frames. ✅ Done (`memoria/MemoryManager.java`)
-- **T1-B — T1-A + Process Manager (GP)**: PCB, ready queue, create/deallocate process, exec, CLI commands. ✅ Done (`ProcessManager/`)
+- **T1-B — T1-A + Process Manager (GP)**: PCB, ready queue, create/deallocate process, exec, CLI commands. ✅ Done (`processManager/`)
 - **T1-C — T1-B + Scheduler (Escalonador)**: Add Round-Robin scheduling with quantum (timer interrupt). In progress.
 
 ## Build & Run
@@ -48,10 +48,10 @@ Available programs: `fatorial`, `fatorialV2`, `progMinimo`, `fibonacci10`, `fibo
 - Frame index `f` spans physical addresses `[f * pageSize, (f+1) * pageSize - 1]`
 - Default: tamMem=1024, tamPg=16 → 64 frames
 
-**3. Process management (`ProcessManager/` package)**
+**3. Process management (`processManager/` package)**
 - `PCB.java` — auto-increment PID, `ProcessStatus` enum, `frames[]`, `pages[]`, `processPc` (saved PC for context switch)
 - `ProcessStatus.java` — state enum: `CREATED → READY → EXECUTING → PAUSE → FINISHED`
-- `ProcessManager.java` — `createProcess(name)`, `dealocateProcess(id)`, `executeProcess(pid, isExecAll)`, `execAll()`, `listProcesses()`; holds `pcbReadyList` (ready queue) and `running` pointer
+- `processManager.java` — `createProcess(name)`, `dealocateProcess(id)`, `executeProcess(pid, isExecAll)`, `execAll()`, `listProcesses()`; holds `pcbReadyList` (ready queue) and `running` pointer
 
 **4. CLI (`Main.java`)** — interactive loop wiring all layers together
 

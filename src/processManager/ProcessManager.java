@@ -1,12 +1,10 @@
-package ProcessManager;
+package processManager;
 
 import memoria.*;
-import system.Sistema;
 import system.Sistema.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ProcessManager {
     private MemoryManager memoryManager;
@@ -112,36 +110,57 @@ public class ProcessManager {
         cpu.setContext(startAddress);
         
         System.out.println("[PM] Executando processo PID=" + pid + "...");
-        pcbReadyList.remove(pcb);
+        synchronized (pcbReadyList) {
+            pcbReadyList.remove(pcb);
+        }
         cpu.run(running, isExecAll);
 
         if(pcb.status == ProcessStatus.FINISHED){
             memoryManager.deallocate(running.pages);
             System.out.println("[PM] Processo PID=" + pid + " finalizado.");
             running = null;
+        }else if(pcb.status == ProcessStatus.BLOCKED){
+            System.out.println("[PM] Processo PID=" + pid + " bloqueado aguardando IO.");
+            running = null;
         }else{
             System.out.println("[PM] Processo PID=" + pid + " interrompido.");
         }
     }
 
+    // Rotina de retorno de IO (chamada pela Thread Console): desbloqueia o
+    // processo e o devolve à fila de prontos para que possa ser reexecutado.
+    public void unblockProcess(PCB process) {
+        process.status = ProcessStatus.READY;
+        synchronized (pcbReadyList) {
+            pcbReadyList.add(process);
+        }
+    }
+
     public void execAll(){
-        while(!pcbReadyList.isEmpty()){
-            executeProcess(pcbReadyList.get(0).id, true);
+        while(true){
+            Integer nextPid;
+            synchronized (pcbReadyList) {
+                if (pcbReadyList.isEmpty()) break;
+                nextPid = pcbReadyList.get(0).id;
+            }
+            executeProcess(nextPid, true);
         }
     }
 
     public void listProcesses() {
         System.out.println("\n--- Lista de Processos ---");
-        if (pcbReadyList.isEmpty()) {
-            System.out.println("Nenhum processo criado.");
-        } else {
-            System.out.printf("%-6s %-15s %-10s%n", "PID", "Programa", "Status");
-            System.out.println("------ --------------- ----------");
-            for (PCB pcb : pcbReadyList) {
-                System.out.printf("%-6d %-15s %-10s%n", 
-                    pcb.id, 
-                    pcb.getProgramName(), 
-                    pcb.status);
+        synchronized (pcbReadyList) {
+            if (pcbReadyList.isEmpty()) {
+                System.out.println("Nenhum processo criado.");
+            } else {
+                System.out.printf("%-6s %-15s %-10s%n", "PID", "Programa", "Status");
+                System.out.println("------ --------------- ----------");
+                for (PCB pcb : pcbReadyList) {
+                    System.out.printf("%-6d %-15s %-10s%n",
+                        pcb.id,
+                        pcb.getProgramName(),
+                        pcb.status);
+                }
             }
         }
         System.out.println();

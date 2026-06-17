@@ -1,9 +1,7 @@
-package ProcessManager;
+package processManager;
 
 import memoria.Frame;
 import memoria.Page;
-
-import java.util.UUID;
 
 public class PCB {
     private static int idCounter = 0;

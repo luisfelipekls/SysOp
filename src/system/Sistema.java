@@ -20,10 +20,12 @@ package system;// PUCRS - Escola Politécnica - Sistemas Operacionais
 //    Veja o main.  Ele instancia o system.Sistema com os elementos mencionados acima.
 //           em seguida solicita a execução de algum programa com  loadAndExec
 
-import ProcessManager.PCB;
-import ProcessManager.ProcessManager;
+import io.GerenciadorIO;
+import io.IORequest;
+import processManager.PCB;
+import processManager.ProcessManager;
 import memoria.MemoryManager;
-import ProcessManager.ProcessStatus;
+import processManager.ProcessStatus;
 
 public class Sistema {
 
@@ -45,7 +47,12 @@ public class Sistema {
 		this.processManager = processManager;
 	}
 
+	public void setGerenciadorIO(GerenciadorIO gerenciadorIO) {
+		this.gerenciadorIO = gerenciadorIO;
+	}
+
 	private MemoryManager memoryManager;
+	private GerenciadorIO gerenciadorIO;
 
 	public class Memory {
 		public Word[] pos; // pos[i] é a posição i da memória. cada posição é uma palavra.
@@ -108,8 +115,9 @@ public class Sistema {
 		private InterruptHandling ih;    // significa desvio para rotinas de tratamento de Int - se int ligada, desvia
 		private SysCallHandling sysCall; // significa desvio para tratamento de chamadas de sistema
 
-		private boolean cpuStop;    // flag para parar CPU - caso de interrupcao que acaba o processo, ou chamada stop - 
+		private boolean cpuStop;    // flag para parar CPU - caso de interrupcao que acaba o processo, ou chamada stop -
 									// nesta versao acaba o sistema no fim do prog
+		private boolean ioBlock;    // sinaliza que o processo foi bloqueado por IO (não finalizou)
 
 		                            // auxilio aa depuração
 		private boolean debug;      // se true entao mostra cada instrucao em execucao
@@ -143,6 +151,11 @@ public class Sistema {
 
 		public void setPageSize(int size) {
 			pageSize = size;
+		}
+
+		// chamado pela rotina de syscall para bloquear o processo atual por IO
+		public void requestBlock() {
+			ioBlock = true;
 		}
 
 		// Tradução de endereço lógico → físico usando a tabela de páginas do processo atual
@@ -183,6 +196,7 @@ public class Sistema {
 			Integer cicleLimit = 5;
 			Integer cicle = 0;
 			cpuStop = false;
+			ioBlock = false;
 			boolean interuption = false;
 			while (!cpuStop) {      // ciclo de instrucoes. acaba cfe resultado da exec da instrucao, veja cada caso.
 				if(isExecAll){
@@ -375,6 +389,9 @@ public class Sistema {
 							sysCall.handle(); // <<<<< aqui desvia para rotina de chamada de sistema, no momento so
 												// temos IO
 							pc++;
+							if (ioBlock) {    // processo foi bloqueado: para a CPU sem finalizar o processo
+								cpuStop = true;
+							}
 							break;
 
 						case STOP: // por enquanto, para execucao
@@ -396,7 +413,11 @@ public class Sistema {
 				runningProcess.processPc = pc;
 				cicle++;
 			} // FIM DO CICLO DE UMA INSTRUÇÃO
-			if(!interuption){
+			if (ioBlock) {
+				// processo bloqueado por IO: salva contexto e mantém o status BLOCKED
+				// (a Thread Console o devolverá à fila de prontos ao concluir o IO)
+				System.arraycopy(reg, 0, runningProcess.savedRegisters, 0, reg.length);
+			} else if (!interuption) {
 				runningProcess.status = ProcessStatus.FINISHED;
 			}
 
@@ -460,18 +481,31 @@ public class Sistema {
 			System.out.println("                                               SYSCALL STOP");
 		}
 
-		public void handle() { // chamada de sistema 
-			                   // suporta somente IO, com parametros 
-							   // reg[8] = in ou out    e reg[9] endereco do inteiro
-			System.out.println("SYSCALL pars:  " + hw.cpu.reg[8] + " / " + hw.cpu.reg[9]);
+		public void handle() { // chamada de sistema
+			                   // suporta somente IO, com parametros
+							   // reg[8] = in ou out    e reg[9] endereco logico do inteiro
+			int op = hw.cpu.reg[8];
+			int logicalAddr = hw.cpu.reg[9];
 
-			if  (hw.cpu.reg[8]==1){
-				  // leitura ...
+			IORequest.Type type;
+			if (op == 1) {
+				type = IORequest.Type.READ;        // leitura
+			} else if (op == 2) {
+				type = IORequest.Type.WRITE;       // escrita
+			} else {
+				System.out.println("  PARAMETRO INVALIDO");
+				return;
+			}
 
-			} else if (hw.cpu.reg[8]==2){
-				  // escrita - escreve o conteudo da memoria na posicao lógica dada em reg[9]
-				  System.out.println("OUT:   "+ hw.mem.pos[hw.cpu.translate(hw.cpu.reg[9])].p);
-			} else {System.out.println("  PARAMETRO INVALIDO"); }		
+			// traduz o endereço lógico do processo atual para físico antes de enfileirar
+			int physicalAddr = hw.cpu.translate(logicalAddr);
+			PCB process = processManager.running;
+
+			// bloqueia o processo e delega o IO para a Thread Console
+			process.status = ProcessStatus.BLOCKED;
+			gerenciadorIO.addBlockedProcess(process);
+			gerenciadorIO.submit(new IORequest(process, type, logicalAddr, physicalAddr));
+			hw.cpu.requestBlock();
 		}
 	}
 

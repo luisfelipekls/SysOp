@@ -1,5 +1,6 @@
+import io.GerenciadorIO;
 import memoria.MemoryManager;
-import ProcessManager.ProcessManager;
+import processManager.ProcessManager;
 import system.Sistema;
 
 import java.util.Scanner;
@@ -8,6 +9,7 @@ public class Main {
     private static Sistema sistema;
     private static MemoryManager memoryManager;
     private static ProcessManager processManager;
+    private static GerenciadorIO gerenciadorIO;
     private static Scanner scanner;
     private static boolean traceEnabled = false;
 
@@ -30,6 +32,16 @@ public class Main {
         sistema.hw.cpu.setAddressOfHandlers(sistema.so.ih, sistema.so.sc);
         sistema.hw.cpu.setUtilities(sistema.so.utils);
         sistema.hw.cpu.setPageSize(pageSize);
+
+        // Thread Console (Gerenciador de IO): roda em paralelo consumindo a fila de
+        // requisições de IO, lendo/escrevendo dados e devolvendo os processos à fila
+        // de prontos quando o IO termina.
+        gerenciadorIO = new GerenciadorIO(sistema.hw.mem, processManager);
+        sistema.setGerenciadorIO(gerenciadorIO);
+
+        Thread consoleThread = new Thread(gerenciadorIO, "Thread-Console");
+        consoleThread.setDaemon(true);
+        consoleThread.start();
 
         scanner = new Scanner(System.in);
         System.out.println("=== Sistema Operacional Simulado ===");
@@ -58,8 +70,16 @@ public class Main {
     private static void commandLoop() {
         while (true) {
             System.out.print("> ");
-            String input = scanner.nextLine().trim();
+            String line = scanner.nextLine();
 
+            // Se há uma leitura de IO pendente, a linha digitada é dado do programa
+            // (entregue à Thread Console), e não um comando do shell.
+            if (gerenciadorIO.hasPendingRead()) {
+                gerenciadorIO.deliverInput(line);
+                continue;
+            }
+
+            String input = line.trim();
             if (input.isEmpty()) continue;
 
             String[] parts = input.split("\\s+");
