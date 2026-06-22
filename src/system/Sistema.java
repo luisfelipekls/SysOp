@@ -98,6 +98,12 @@ public class Sistema {
 		noInterrupt, intEnderecoInvalido, intInstrucaoInvalida, intOverflow;
 	}
 
+	// Resultado de uma fatia de execução da CPU (runQuantum):
+	//   FINISHED  - processo terminou (STOP) ou foi abortado por interrupção de erro
+	//   BLOCKED   - processo pediu IO e foi bloqueado (syscall)
+	//   PREEMPTED - acabou a fatia de tempo (interrupção de timer), processo volta aos prontos
+	public enum CPUStatus { FINISHED, BLOCKED, PREEMPTED }
+
 	public class CPU {
 		private int maxInt; // valores maximo e minimo para inteiros nesta cpu
 		private int minInt;
@@ -125,6 +131,7 @@ public class Sistema {
 
 		private PCB currentProcess; // processo em execução (usado para tradução de endereços)
 		private int pageSize;       // tamanho da página, injetado pelo Main
+		private int quantum = 5;    // fatia de tempo (Round Robin por contagem de instruções)
 
 		public CPU(Memory _mem, boolean _debug) { // ref a MEMORIA passada na criacao da CPU
 			maxInt = 32767;            // capacidade de representacao modelada
@@ -151,6 +158,10 @@ public class Sistema {
 
 		public void setPageSize(int size) {
 			pageSize = size;
+		}
+
+		public void setQuantum(int q) {
+			quantum = q;
 		}
 
 		// chamado pela rotina de syscall para bloquear o processo atual por IO
@@ -190,24 +201,23 @@ public class Sistema {
 			irpt = Interrupts.noInterrupt;                // reset da interrupcao registrada
 		}
 
-		public void run(PCB runningProcess, boolean isExecAll) {                               // execucao da CPU supoe que o contexto da CPU, vide acima,
+		// Executa UMA fatia de tempo (quantum) do processo. Restaura o contexto a
+		// partir do PCB, executa até: acabar a fatia (timer), o processo pedir IO
+		// (bloqueio), parar (STOP) ou ocorrer interrupção de erro. Não mexe em filas
+		// — quem decide o destino do processo é a Thread CPU (ProcessManager.cpuLoop).
+		public CPUStatus runQuantum(PCB runningProcess) {
 			this.currentProcess = runningProcess;
-			System.arraycopy(runningProcess.savedRegisters, 0, reg, 0, reg.length); // restaura contexto de registradores
-			Integer cicleLimit = 5;
-			Integer cicle = 0;
+			pc = runningProcess.processPc;                                           // restaura PC lógico salvo no PCB
+			System.arraycopy(runningProcess.savedRegisters, 0, reg, 0, reg.length);  // restaura contexto de registradores
+			irpt = Interrupts.noInterrupt;
 			cpuStop = false;
 			ioBlock = false;
-			boolean interuption = false;
+			int cicle = 0;
 			while (!cpuStop) {      // ciclo de instrucoes. acaba cfe resultado da exec da instrucao, veja cada caso.
-				if(isExecAll){
-					if (cicle >= cicleLimit) {
-						sysCall.stop();
-						cpuStop = true;
-						System.arraycopy(reg, 0, runningProcess.savedRegisters, 0, reg.length); // salva registradores
-						processManager.pcbReadyList.add(runningProcess);
-						interuption = true;
-						break;
-					}
+				if (cicle >= quantum) {                 // INTERRUPÇÃO DE TIMER: acabou a fatia de tempo
+					System.arraycopy(reg, 0, runningProcess.savedRegisters, 0, reg.length); // salva registradores
+					runningProcess.processPc = pc;      // salva PC lógico para retomar depois
+					return CPUStatus.PREEMPTED;
 				}
 
 				if (legal(pc)) { // pc valido (endereço lógico)
@@ -413,14 +423,15 @@ public class Sistema {
 				runningProcess.processPc = pc;
 				cicle++;
 			} // FIM DO CICLO DE UMA INSTRUÇÃO
-			if (ioBlock) {
-				// processo bloqueado por IO: salva contexto e mantém o status BLOCKED
-				// (a Thread Console o devolverá à fila de prontos ao concluir o IO)
-				System.arraycopy(reg, 0, runningProcess.savedRegisters, 0, reg.length);
-			} else if (!interuption) {
-				runningProcess.status = ProcessStatus.FINISHED;
-			}
 
+			// Saiu do loop: ou o processo pediu IO (bloqueio), ou parou (STOP / erro).
+			System.arraycopy(reg, 0, runningProcess.savedRegisters, 0, reg.length); // salva contexto
+			runningProcess.processPc = pc;
+			if (ioBlock) {
+				// processo bloqueado por IO: a Thread Console o devolverá aos prontos ao concluir
+				return CPUStatus.BLOCKED;
+			}
+			return CPUStatus.FINISHED; // STOP ou interrupção de erro encerram o processo
 		}
 	}
 	// ------------------ C P U - fim
@@ -559,7 +570,11 @@ public class Sistema {
 			dump(0, p.length); // dump da memoria nestas posicoes
 			hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
 			System.out.println("---------------------------------- inicia execucao ");
-			hw.cpu.run(processManager.running, false); // cpu roda programa ate parar
+			// Caminho legado (não usado pelo Main multithread). Executa em fatias até terminar.
+			CPUStatus st;
+			do {
+				st = hw.cpu.runQuantum(processManager.running);
+			} while (st == CPUStatus.PREEMPTED);
 			System.out.println("---------------------------------- memoria após execucao ");
 			dump(0, p.length); // dump da memoria com resultado
 		}

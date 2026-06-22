@@ -1,0 +1,92 @@
+ID   Nome do prog    Razao         Estado ini    Prox estado   Tabela de paginas [pag,frame]
+---- --------------- ------------- ------------- ------------- ------------------------------
+0    fibonacciREAD   criacao       nulo          criado        { [0,0], [1,1], [2,2], [3,3] }
+1    fatorialV2      criacao       nulo          criado        { [0,4], [1,5] }
+2    PB              criacao       nulo          criado        { [0,6] }
+3    progMinimo      criacao       nulo          criado        { [0,7] }
+4    fibonacci10     criacao       nulo          criado        { [0,8], [1,9] }
+0    fibonacciREAD   admissao      criado        pronto        { [0,0], [1,1], [2,2], [3,3] }
+1    fatorialV2      admissao      criado        pronto        { [0,4], [1,5] }
+2    PB              admissao      criado        pronto        { [0,6] }
+3    progMinimo      admissao      criado        pronto        { [0,7] }
+4    fibonacci10     admissao      criado        pronto        { [0,8], [1,9] }
+0    fibonacciREAD   escalona      pronto        rodando       { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   solicita IO   rodando       bloqueado     { [0,0], [1,1], [2,2], [3,3] }
+1    fatorialV2      escalona      pronto        rodando       { [0,4], [1,5] }
+1    fatorialV2      fatia tempo   rodando       pronto        { [0,4], [1,5] }
+2    PB              escalona      pronto        rodando       { [0,6] }
+2    PB              stop          rodando       finalizado    { [0,6] }
+3    progMinimo      escalona      pronto        rodando       { [0,7] }
+3    progMinimo      fatia tempo   rodando       pronto        { [0,7] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+1    fatorialV2      escalona      pronto        rodando       { [0,4], [1,5] }
+1    fatorialV2      fatia tempo   rodando       pronto        { [0,4], [1,5] }
+3    progMinimo      escalona      pronto        rodando       { [0,7] }
+3    progMinimo      stop          rodando       finalizado    { [0,7] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+1    fatorialV2      escalona      pronto        rodando       { [0,4], [1,5] }
+1    fatorialV2      fatia tempo   rodando       pronto        { [0,4], [1,5] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+1    fatorialV2      escalona      pronto        rodando       { [0,4], [1,5] }
+1    fatorialV2      fatia tempo   rodando       pronto        { [0,4], [1,5] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+1    fatorialV2      escalona      pronto        rodando       { [0,4], [1,5] }
+1    fatorialV2      fatia tempo   rodando       pronto        { [0,4], [1,5] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+1    fatorialV2      escalona      pronto        rodando       { [0,4], [1,5] }
+1    fatorialV2      fatia tempo   rodando       pronto        { [0,4], [1,5] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+1    fatorialV2      escalona      pronto        rodando       { [0,4], [1,5] }
+1    fatorialV2      solicita IO   rodando       bloqueado     { [0,4], [1,5] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     fatia tempo   rodando       pronto        { [0,8], [1,9] }
+4    fibonacci10     escalona      pronto        rodando       { [0,8], [1,9] }
+4    fibonacci10     stop          rodando       finalizado    { [0,8], [1,9] }
+0    fibonacciREAD   retorno IO    bloqueado     pronto        { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   escalona      pronto        rodando       { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   fatia tempo   rodando       pronto        { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   escalona      pronto        rodando       { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   fatia tempo   rodando       pronto        { [0,0], [1,1], [2,2], [3,3] }
+1    fatorialV2      retorno IO    bloqueado     pronto        { [0,4], [1,5] }
+0    fibonacciREAD   escalona      pronto        rodando       { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   fatia tempo   rodando       pronto        { [0,0], [1,1], [2,2], [3,3] }
+1    fatorialV2      escalona      pronto        rodando       { [0,4], [1,5] }
+1    fatorialV2      stop          rodando       finalizado    { [0,4], [1,5] }
+0    fibonacciREAD   escalona      pronto        rodando       { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   fatia tempo   rodando       pronto        { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   escalona      pronto        rodando       { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   fatia tempo   rodando       pronto        { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   escalona      pronto        rodando       { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   fatia tempo   rodando       pronto        { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   escalona      pronto        rodando       { [0,0], [1,1], [2,2], [3,3] }
+0    fibonacciREAD   stop          rodando       finalizado    { [0,0], [1,1], [2,2], [3,3] }

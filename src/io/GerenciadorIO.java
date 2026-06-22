@@ -118,6 +118,5 @@ public class GerenciadorIO implements Runnable {
         processManager.unblockProcess(process);
         System.out.println("[Console] IO concluído: PID=" + process.id
                 + " desbloqueado e devolvido à fila de prontos.");
-        System.out.print("> ");
     }
 }

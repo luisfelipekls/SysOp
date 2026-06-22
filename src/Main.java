@@ -32,6 +32,7 @@ public class Main {
         sistema.hw.cpu.setAddressOfHandlers(sistema.so.ih, sistema.so.sc);
         sistema.hw.cpu.setUtilities(sistema.so.utils);
         sistema.hw.cpu.setPageSize(pageSize);
+        sistema.hw.cpu.setDebug(false); // execução concorrente: trace desligado por padrão (use traceOn)
 
         // Thread Console (Gerenciador de IO): roda em paralelo consumindo a fila de
         // requisições de IO, lendo/escrevendo dados e devolvendo os processos à fila
@@ -43,19 +44,35 @@ public class Main {
         consoleThread.setDaemon(true);
         consoleThread.start();
 
+        // Thread Escalonador: escolhe o próximo processo pronto quando a CPU está livre.
+        Thread schedulerThread = new Thread(processManager::schedulerLoop, "Thread-Escalonador");
+        schedulerThread.setDaemon(true);
+        schedulerThread.start();
+
+        // Thread CPU: executa uma fatia de tempo do processo escalonado e o devolve
+        // ao seu destino (pronto / bloqueado / finalizado).
+        Thread cpuThread = new Thread(processManager::cpuLoop, "Thread-CPU");
+        cpuThread.setDaemon(true);
+        cpuThread.start();
+
         scanner = new Scanner(System.in);
         System.out.println("=== Sistema Operacional Simulado ===");
         System.out.println("Comandos disponíveis:");
         System.out.println("  new <program>  - Cria um novo processo");
+        System.out.println("  load <n>       - Cria uma carga de n processos (com IO) a escalonar");
         System.out.println("  rm <pid>       - Remove um processo");
         System.out.println("  ps             - Lista todos os processos");
         System.out.println("  dump           - Mostra estado da memória");
         System.out.println("  dumpM          - Mostra estado do gerenciador de memória");
+        System.out.println("  dumpP <pid>    - Dump da memória de um processo (ordem lógica)");
         System.out.println("  exec <pid>     - Executa um processo");
         System.out.println("  execAll        - Executa todos os processos");
         System.out.println("  traceOn        - Habilita rastreamento (debug)");
         System.out.println("  traceOff       - Desabilita rastreamento (debug)");
+        System.out.println("  clearLog       - Limpa o arquivo de log de escalonamento");
         System.out.println("  exit           - Sai do sistema");
+        System.out.println();
+        System.out.println("O log de transicoes de estado e gravado em 'escalonamento.log'.");
         System.out.println();
         System.out.println("Programas disponíveis:");
         listAvailablePrograms();
@@ -64,7 +81,8 @@ public class Main {
         commandLoop();
 
         scanner.close();
-        System.out.println("Sistema encerrado.");
+        processManager.closeLog();
+        System.out.println("Sistema encerrado. Log de transicoes em 'escalonamento.log'.");
     }
 
     private static void commandLoop() {
@@ -89,6 +107,9 @@ public class Main {
                 case "new":
                     handleNew(parts);
                     break;
+                case "load":
+                    handleLoad(parts);
+                    break;
                 case "rm":
                     handleRm(parts);
                     break;
@@ -101,6 +122,9 @@ public class Main {
                 case "dumpm":
                     handleDumpM();
                     break;
+                case "dumpp":
+                    handleDumpP(parts);
+                    break;
                 case "exec":
                     handleExec(parts);
                     break;
@@ -112,6 +136,9 @@ public class Main {
                     break;
                 case "traceoff":
                     handleTraceOff();
+                    break;
+                case "clearlog":
+                    processManager.clearLog();
                     break;
                 case "exit":
                     return;
@@ -136,6 +163,19 @@ public class Main {
 
         if (!success) {
             System.out.println("Falha ao criar processo. Verifique se o programa existe e se há memória disponível.");
+        }
+    }
+
+    private static void handleLoad(String[] parts) {
+        if (parts.length < 2) {
+            System.out.println("Uso: load <n>  (cria uma carga de n processos a escalonar)");
+            return;
+        }
+        try {
+            int n = Integer.parseInt(parts[1]);
+            processManager.createLoad(n);
+        } catch (NumberFormatException e) {
+            System.out.println("Quantidade invalida: " + parts[1]);
         }
     }
 
@@ -173,18 +213,23 @@ public class Main {
         System.out.println();
     }
 
-    private static void handleExec(String[] parts) {
+    private static void handleDumpP(String[] parts) {
         if (parts.length < 2) {
-            System.out.println("Uso: exec <pid>");
+            System.out.println("Uso: dumpP <pid>  (dump da memoria de um processo, em ordem logica)");
             return;
         }
-
         try {
             int pid = Integer.parseInt(parts[1]);
-            processManager.executeProcess(pid, false);
+            processManager.dumpProcess(pid);
         } catch (NumberFormatException e) {
-            System.out.println("PID inválido: " + parts[1]);
+            System.out.println("PID invalido: " + parts[1]);
         }
+    }
+
+    private static void handleExec(String[] parts) {
+        // O 'new' apenas cria/aloca o processo. A execução só começa com 'execAll',
+        // que coloca os processos criados na fila de prontos e inicia o escalonamento.
+        System.out.println("[Shell] Use 'execAll' para escalonar e executar os processos criados com 'new'.");
     }
 
     private static void handleExecAll() {
@@ -206,13 +251,16 @@ public class Main {
     private static void showHelp() {
         System.out.println("\n=== COMANDOS DISPONÍVEIS ===");
         System.out.println("  new <program>  - Cria um novo processo");
+        System.out.println("  load <n>       - Cria uma carga de n processos (com IO) a escalonar");
         System.out.println("  rm <pid>       - Remove um processo");
         System.out.println("  ps             - Lista todos os processos");
         System.out.println("  dump           - Mostra estado da memória");
         System.out.println("  dumpM          - Mostra estado do gerenciador de memória");
+        System.out.println("  dumpP <pid>    - Dump da memória de um processo (ordem lógica)");
         System.out.println("  exec <pid>     - Executa um processo");
         System.out.println("  traceOn        - Habilita rastreamento (debug)");
         System.out.println("  traceOff       - Desabilita rastreamento (debug)");
+        System.out.println("  clearLog       - Limpa o arquivo de log de escalonamento");
         System.out.println("  exit           - Sai do sistema");
         System.out.println();
     }
